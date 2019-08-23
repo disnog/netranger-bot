@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "network-ranger"
+version = "0.1.0"
+description = "A discord bot for https://networking-discord.github.io"
+authors = ["Jason R. Rokeach <jason@rokeach.net>"]
+license = "GPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+"discord.py" = "^1.2"
+
+[tool.poetry.dev-dependencies]
+black = {version = "^18.3-alpha.0", allows-prereleases = true}
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
