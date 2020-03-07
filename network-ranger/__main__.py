@@ -22,6 +22,7 @@ Connect as a Discord bot to maintain the Networking Discord Server.
 
 # TODO: Fix these lazy hard set global variables
 command_prefix = "$"
+welcomechannel_name = "mods-cnc"
 bot_description = (
     "The in-development bot which will maintain the Networking Discord server"
 )
@@ -46,6 +47,16 @@ async def on_ready():
             username=bot.user.name, userid=bot.user.id
         )
     )
+    # TODO: De-hardcode
+    global welcomechannel
+    welcomechannel = discord.utils.get(
+        bot.get_all_channels(), guild__name="Networking", name=welcomechannel_name
+    )
+    print(
+        "Welcome Channel: {welcomechannel_name} (ID: {welcomechannel_id})".format(
+            welcomechannel_name=welcomechannel.name, welcomechannel_id=welcomechannel.id
+        )
+    )
 
 
 @bot.command()
@@ -56,7 +67,27 @@ async def info(ctx):
 
 
 @bot.event
+async def on_member_join(member):
+    """
+    Handle users joining the server.
+    :param message:
+    :return:
+    """
+    await welcomechannel.send(
+        "Welcome to {guild} {mention}".format(
+            guild=member.guild.name, mention=member.mention
+        )
+    )
+    print("Welcome", member.mention)
+
+
+@bot.event
 async def on_message(message):
+    """
+    Handle incoming messages.
+    :param message:
+    :return:
+    """
     if message.author == bot.user:
         return
 
