@@ -25,13 +25,15 @@ import argparse
 import os
 from discord.ext import commands
 
-token = ""
+token = None
 welcome = "welcome"
 
 # Separate these and add other environment variables.
 try:
     token = os.environ["TOKEN"]
     welcome = os.environ["WELCOME_CHANNEL"]
+    bot_description = os.environ["BOT_DESCRIPTION"]
+    command_prefix = os.environ["COMMAND_PREFIX"]
 except KeyError as e:
     print("Warning: Environmental variable(s) not defined")
 
@@ -58,6 +60,9 @@ if "bot_description" in args and args["bot_description"] is not None:
 
 if "token" in args and args["token"] is not None:
     token = args["token"]
+
+if token is None:
+    raise Exception("Cannot start without a token.")
 
 bot = commands.Bot(command_prefix=command_prefix, description=bot_description)
 
