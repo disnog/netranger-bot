@@ -27,8 +27,9 @@ from discord.ext import commands
 
 token = None
 welcome = "welcome"
+command_prefix = "$"
 
-# Separate these and add other environment variables.
+# Separate these
 try:
     token = os.environ["TOKEN"]
     welcome = os.environ["WELCOME_CHANNEL"]
@@ -42,7 +43,7 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("-t", "--token", help="Discord API Token", required=token == "")
 parser.add_argument("--welcome", help="Welcome Channel", default=welcome)
-parser.add_argument("--command-prefix", help="Command Prefix", default="$")
+parser.add_argument("--command-prefix", help="Command Prefix", default=command_prefix)
 parser.add_argument(
     "--bot-description",
     help="Bot Description",
