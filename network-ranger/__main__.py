@@ -22,13 +22,23 @@ Connect as a Discord bot to maintain the Networking Discord Server.
 
 import discord
 import argparse
+import os
 from discord.ext import commands
+
+token = ""
+welcome = "welcome"
+
+try:
+    token = os.environ["TOKEN"]
+    welcome = os.environ["WELCOME_CHANNEL"]
+except KeyError as e:
+    print("Warning: Environmental variable(s) not defined")
 
 parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
-parser.add_argument("-t", "--token", help="Discord API Token", required=True)
-parser.add_argument("--welcome", help="Welcome Channel", default="welcome")
+parser.add_argument("-t", "--token", help="Discord API Token", required=token!="")
+parser.add_argument("--welcome", help="Welcome Channel", default=welcome)
 parser.add_argument("--command-prefix", help="Command Prefix", default="$")
 parser.add_argument(
     "--bot-description",
