@@ -20,13 +20,6 @@
 Connect as a Discord bot to maintain the Networking Discord Server.
 """
 
-# TODO: Fix these lazy hard set global variables
-command_prefix = "$"
-welcomechannel_name = "mods-cnc"
-bot_description = (
-    "The in-development bot which will maintain the Networking Discord server"
-)
-
 import discord
 import argparse
 from discord.ext import commands
@@ -35,7 +28,17 @@ parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
 parser.add_argument("-t", "--token", help="Discord API Token", required=True)
+parser.add_argument("--welcome", help="Welcome Channel", default="welcome")
+parser.add_argument("--command-prefix", help="Command Prefix", default="$")
+parser.add_argument(
+    "--bot-description",
+    help="Bot Description",
+    default="The in-development bot which will maintain the Networking Discord server",
+)
 args = vars(parser.parse_args())
+welcomechannel_name = args["welcome"]
+command_prefix = args["command_prefix"]
+bot_description = args["bot_description"]
 
 bot = commands.Bot(command_prefix=command_prefix, description=bot_description)
 
@@ -96,6 +99,11 @@ async def on_message(message):
 
 
 async def process_command(message):
+    """
+    Process commands prefixed with command_prefix.
+    :param message:
+    :return:
+    """
     command = message.content.lstrip(command_prefix).split()
     await message.channel.send("You said: {}".format(" ".join(command)))
 
