@@ -28,6 +28,7 @@ from discord.ext import commands
 token = ""
 welcome = "welcome"
 
+# Separate these and add other environment variables.
 try:
     token = os.environ["TOKEN"]
     welcome = os.environ["WELCOME_CHANNEL"]
@@ -37,7 +38,7 @@ except KeyError as e:
 parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
-parser.add_argument("-t", "--token", help="Discord API Token", required=token=="")
+parser.add_argument("-t", "--token", help="Discord API Token", required=token == "")
 parser.add_argument("--welcome", help="Welcome Channel", default=welcome)
 parser.add_argument("--command-prefix", help="Command Prefix", default="$")
 parser.add_argument(
@@ -46,9 +47,17 @@ parser.add_argument(
     default="The in-development bot which will maintain the Networking Discord server",
 )
 args = vars(parser.parse_args())
-welcomechannel_name = args["welcome"]
-command_prefix = args["command_prefix"]
-bot_description = args["bot_description"]
+if "welcome" in args and args["welcome"] is not None:
+    welcome = args["welcome"]
+
+if "command_prefix" in args and args["command_prefix"] is not None:
+    command_prefix = args["command_prefix"]
+
+if "bot_description" in args and args["bot_description"] is not None:
+    bot_description = args["bot_description"]
+
+if "token" in args and args["token"] is not None:
+    token = args["token"]
 
 bot = commands.Bot(command_prefix=command_prefix, description=bot_description)
 
@@ -63,7 +72,7 @@ async def on_ready():
     # TODO: De-hardcode
     global welcomechannel
     welcomechannel = discord.utils.get(
-        bot.get_all_channels(), guild__name="Networking", name=welcomechannel_name
+        bot.get_all_channels(), guild__name="Networking", name=welcome
     )
     print(
         "Welcome Channel: {welcomechannel_name} (ID: {welcomechannel_id})".format(
@@ -118,4 +127,4 @@ async def process_command(message):
     await message.channel.send("You said: {}".format(" ".join(command)))
 
 
-bot.run(args["token"])
+bot.run(token)
