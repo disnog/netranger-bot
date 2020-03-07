@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-#!/usr/bin/env python3
-
 #  network-ranger - __main__.py
 #  Copyright (C) 2019  Jason R. Rokeach
 #
