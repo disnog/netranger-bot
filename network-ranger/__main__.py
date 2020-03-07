@@ -21,30 +21,52 @@ Connect as a Discord bot to maintain the Networking Discord Server.
 """
 
 # TODO: Fix these lazy hard set global variables
-command_prefix='$'
-bot_description='The in-development bot which will maintain the Networking Discord server'
+command_prefix = "$"
+bot_description = (
+    "The in-development bot which will maintain the Networking Discord server"
+)
 
 import discord
 import argparse
 from discord.ext import commands
 
-parser = argparse.ArgumentParser(fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('-t','--token', help='Discord API Token', required=True)
+parser = argparse.ArgumentParser(
+    fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
+)
+parser.add_argument("-t", "--token", help="Discord API Token", required=True)
 args = vars(parser.parse_args())
 
-bot = commands.Bot(command_prefix=command_prefix,description=bot_description)
+bot = commands.Bot(command_prefix=command_prefix, description=bot_description)
+
 
 @bot.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
+    print(
+        'Logged in as "{username}" (ID: {userid})'.format(
+            username=bot.user.name, userid=bot.user.id
+        )
+    )
+
 
 @bot.command()
 async def info(ctx):
-    embed=discord.Embed(title='Network Ranger',description=bot_description)
-    embed.add_field(name='Author',value='Jason')
+    embed = discord.Embed(title="Network Ranger", description=bot_description)
+    embed.add_field(name="Author", value="Jason")
     await ctx.send(embed=embed)
 
-bot.run(args['token'])
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content.startswith(command_prefix):
+        await process_command(message)
+
+
+async def process_command(message):
+    command = message.content.lstrip(command_prefix).split()
+    await message.channel.send("You said: {}".format(" ".join(command)))
+
+
+bot.run(args["token"])
