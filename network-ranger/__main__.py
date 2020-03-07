@@ -37,7 +37,7 @@ except KeyError as e:
 parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
-parser.add_argument("-t", "--token", help="Discord API Token", required=token!="")
+parser.add_argument("-t", "--token", help="Discord API Token", required=token=="")
 parser.add_argument("--welcome", help="Welcome Channel", default=welcome)
 parser.add_argument("--command-prefix", help="Command Prefix", default="$")
 parser.add_argument(
