@@ -30,6 +30,7 @@ welcomechannel_name = "welcome"
 logchannel_name = "mods-cnc"
 command_prefix = "$"
 welcome_message = "Hi {mention}, welcome to {server}!"
+bot_description = "The Networking Discord Bot"
 
 # TODO: Handle these in a loop
 # TODO: Document environment variables
@@ -76,9 +77,7 @@ parser.add_argument(
 )
 parser.add_argument("--command-prefix", help="Command Prefix", default=command_prefix)
 parser.add_argument(
-    "--bot-description",
-    help="Bot Description",
-    default="The in-development bot which will maintain the Networking Discord server",
+    "--bot-description", help="Bot Description", default=bot_description
 )
 args = vars(parser.parse_args())
 if "welcome_channel" in args and args["welcome_channel"] is not None:
