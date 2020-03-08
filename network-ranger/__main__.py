@@ -78,7 +78,7 @@ if token is None:
 bot = commands.Bot(
     command_prefix=command_prefix,
     description=bot_description,
-    # De-hardcode activity
+    # TODO: De-hardcode activity
     activity=discord.Activity(
         type=discord.ActivityType.playing,
         name="Network Ranger",
