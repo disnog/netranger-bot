@@ -106,11 +106,13 @@ async def on_ready():
     )
 
 
-@bot.command()
+@bot.command(help="Shows bot information")
 async def info(ctx):
     embed = discord.Embed(title="Network Ranger", description=bot_description)
-    embed.add_field(name="Author", value="Jason")
     embed.add_field(name="Command Prefix", value=command_prefix)
+    embed.add_field(
+        name="Github", value="https://github.com/networking-discord/network-ranger"
+    )
     await ctx.send(embed=embed)
 
 
