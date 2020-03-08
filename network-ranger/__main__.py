@@ -101,6 +101,7 @@ async def on_ready():
 async def info(ctx):
     embed = discord.Embed(title="Network Ranger", description=bot_description)
     embed.add_field(name="Author", value="Jason")
+    embed.add_field(name="Command Prefix", value=command_prefix)
     await ctx.send(embed=embed)
 
 
@@ -116,18 +117,19 @@ async def on_member_join(member):
     )
 
 
-@bot.event
-async def on_message(message):
-    """
-    Handle incoming messages.
-    :param message:
-    :return:
-    """
-    if message.author == bot.user:
-        return
-
-    if message.content.startswith(command_prefix):
-        await process_command(message)
+# TODO: Enable this in a way that doesn't interfere with command processing.
+# @bot.event
+# async def on_message(message):
+#     """
+#     Handle incoming messages.
+#     :param message:
+#     :return:
+#     """
+#     if message.author == bot.user:
+#         return
+#
+#     if message.content.startswith(command_prefix):
+#         return
 
 
 async def process_command(message):
