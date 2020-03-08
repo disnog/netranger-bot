@@ -26,15 +26,17 @@ import os
 from discord.ext import commands
 
 token = None
-welcome = "welcome"
+welcomechannel_name = "welcome"
 command_prefix = "$"
+welcome_message = "Hi {mention}, welcome to {server}!"
 
 # Separate these
 try:
     token = os.environ["TOKEN"]
-    welcome = os.environ["WELCOME_CHANNEL"]
+    welcomechannel_name = os.environ["WELCOMECHANNEL_NAME"]
     bot_description = os.environ["BOT_DESCRIPTION"]
     command_prefix = os.environ["COMMAND_PREFIX"]
+    welcome_message = os.environ["WELCOME_MESSAGE"]
 except KeyError as e:
     print("Warning: Environmental variable(s) not defined")
 
@@ -42,7 +44,12 @@ parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
 parser.add_argument("-t", "--token", help="Discord API Token", required=token == "")
-parser.add_argument("--welcome", help="Welcome Channel", default=welcome)
+parser.add_argument(
+    "--welcome-channel", help="Welcome Channel", default=welcomechannel_name
+)
+parser.add_argument(
+    "--welcome-message", help="Welcome Message", default=welcome_message
+)
 parser.add_argument("--command-prefix", help="Command Prefix", default=command_prefix)
 parser.add_argument(
     "--bot-description",
@@ -50,8 +57,11 @@ parser.add_argument(
     default="The in-development bot which will maintain the Networking Discord server",
 )
 args = vars(parser.parse_args())
-if "welcome" in args and args["welcome"] is not None:
-    welcome = args["welcome"]
+if "welcome_channel" in args and args["welcome_channel"] is not None:
+    welcomechannel_name = args["welcome_channel"]
+
+if "welcome_message" in args and args["welcome_message"] is not None:
+    welcome_message = args["welcome_message"]
 
 if "command_prefix" in args and args["command_prefix"] is not None:
     command_prefix = args["command_prefix"]
@@ -78,7 +88,7 @@ async def on_ready():
     # TODO: De-hardcode
     global welcomechannel
     welcomechannel = discord.utils.get(
-        bot.get_all_channels(), guild__name="Networking", name=welcome
+        bot.get_all_channels(), guild__name="Networking", name=welcomechannel_name
     )
     print(
         "Welcome Channel: {welcomechannel_name} (ID: {welcomechannel_id})".format(
@@ -102,11 +112,8 @@ async def on_member_join(member):
     :return:
     """
     await welcomechannel.send(
-        "Welcome to {guild} {mention}".format(
-            guild=member.guild.name, mention=member.mention
-        )
+        welcome_message.format(server=member.guild.name, mention=member.mention)
     )
-    print("Welcome", member.mention)
 
 
 @bot.event
