@@ -31,17 +31,37 @@ logchannel_name = "mods-cnc"
 command_prefix = "$"
 welcome_message = "Hi {mention}, welcome to {server}!"
 
-# TODO: Separate these
+# TODO: Handle these in a loop
 # TODO: Document environment variables
 try:
     token = os.environ["TOKEN"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     welcomechannel_name = os.environ["WELCOMECHANNEL_NAME"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     logchannel_name = os.environ["LOGCHANNEL_NAME"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     bot_description = os.environ["BOT_DESCRIPTION"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     command_prefix = os.environ["COMMAND_PREFIX"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     welcome_message = os.environ["WELCOME_MESSAGE"]
 except KeyError as e:
-    print("Warning: Environmental variable(s) not defined")
+    print("Warning: Environment variable", e.args[0], "not defined")
 
 parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
