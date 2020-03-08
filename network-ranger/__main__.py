@@ -27,13 +27,16 @@ from discord.ext import commands
 
 token = None
 welcomechannel_name = "welcome"
+logchannel_name = "mods-cnc"
 command_prefix = "$"
 welcome_message = "Hi {mention}, welcome to {server}!"
 
-# Separate these
+# TODO: Separate these
+# TODO: Document environment variables
 try:
     token = os.environ["TOKEN"]
     welcomechannel_name = os.environ["WELCOMECHANNEL_NAME"]
+    logchannel_name = os.environ["LOGCHANNEL_NAME"]
     bot_description = os.environ["BOT_DESCRIPTION"]
     command_prefix = os.environ["COMMAND_PREFIX"]
     welcome_message = os.environ["WELCOME_MESSAGE"]
@@ -47,6 +50,7 @@ parser.add_argument("-t", "--token", help="Discord API Token", required=token ==
 parser.add_argument(
     "--welcome-channel", help="Welcome Channel", default=welcomechannel_name
 )
+parser.add_argument("--log-channel", help="Log Channel", default=logchannel_name)
 parser.add_argument(
     "--welcome-message", help="Welcome Message", default=welcome_message
 )
@@ -59,6 +63,9 @@ parser.add_argument(
 args = vars(parser.parse_args())
 if "welcome_channel" in args and args["welcome_channel"] is not None:
     welcomechannel_name = args["welcome_channel"]
+
+if "log_channel" in args and args["log_channel"] is not None:
+    logchannel_name = args["log_channel"]
 
 if "welcome_message" in args and args["welcome_message"] is not None:
     welcome_message = args["welcome_message"]
@@ -102,6 +109,20 @@ async def on_ready():
     print(
         "Welcome Channel: {welcomechannel_name} (ID: {welcomechannel_id})".format(
             welcomechannel_name=welcomechannel.name, welcomechannel_id=welcomechannel.id
+        )
+    )
+    global logchannel
+    logchannel = discord.utils.get(
+        bot.get_all_channels(), guild__name="Networking", name=logchannel_name
+    )
+    print(
+        "Log Channel: {logchannel_name} (ID: {logchannel_id})".format(
+            logchannel_name=logchannel.name, logchannel_id=logchannel.id
+        )
+    )
+    await logchannel.send(
+        "Bot Online. Command prefix: {command_prefix}".format(
+            command_prefix=command_prefix
         )
     )
 
