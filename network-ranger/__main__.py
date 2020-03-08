@@ -75,7 +75,16 @@ if "token" in args and args["token"] is not None:
 if token is None:
     raise Exception("Cannot start without a token.")
 
-bot = commands.Bot(command_prefix=command_prefix, description=bot_description)
+bot = commands.Bot(
+    command_prefix=command_prefix,
+    description=bot_description,
+    # De-hardcode activity
+    activity=discord.Activity(
+        type=discord.ActivityType.playing,
+        name="Network Ranger",
+        url="https://github.com/Networking-discord/network-ranger",
+    ),
+)
 
 
 @bot.event
