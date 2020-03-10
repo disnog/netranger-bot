@@ -30,6 +30,7 @@ token = None
 guild_name = None
 welcomechannel_name = "welcome"
 memberrole_name = "Members"
+eggsrole_name = "!eggs"
 memberchannel_name = "general"
 logchannel_name = "mods-cnc"
 command_prefix = "$"
@@ -90,6 +91,11 @@ except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
 
 try:
+    eggsrole_name = os.environ["EGGSROLE_NAME"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     memberchannel_name = os.environ["MEMBERCHANNEL_NAME"]
 except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
@@ -118,6 +124,7 @@ parser.add_argument(
     "--welcome-channel", help="Welcome Channel Name (No #)", default=welcomechannel_name
 )
 parser.add_argument("--member-role", help="Member Role Name", default=memberrole_name)
+parser.add_argument("--eggs-role", help="Eggs Role Name", default=eggsrole_name)
 parser.add_argument(
     "--member-channel", help="Member Channel Name (No #)", default=memberchannel_name
 )
@@ -137,6 +144,9 @@ if "welcome_channel" in args and args["welcome_channel"] is not None:
 
 if "member_role" in args and args["member_role"] is not None:
     memberrole_name = args["member_role"]
+
+if "eggs_role" in args and args["eggs_role"] is not None:
+    eggsrole_name = args["eggs_role"]
 
 if "member_channel" in args and args["member_channel"] is not None:
     memberchannel_name = args["member_channel"]
@@ -190,6 +200,13 @@ async def on_ready():
     print(
         "Member Role: {memberrole_name} (ID: {memberrole_id})".format(
             memberrole_name=memberrole.name, memberrole_id=memberrole.id
+        )
+    )
+    global eggsrole
+    eggsrole = discord.utils.get(welcomechannel.guild.roles, name=eggsrole_name)
+    print(
+        "Eggs Role: {eggsrole_name} (ID: {eggsrole_id})".format(
+            eggsrole_name=eggsrole.name, eggsrole_id=eggsrole.id
         )
     )
     global memberchannel
@@ -247,6 +264,16 @@ async def accept(ctx, *args: str):
                     mention=ctx.author.mention, server=memberchannel.guild.name
                 )
             )
+    elif args[0] == "eggs":
+        await ctx.author.add_roles(
+            eggsrole, reason="Really, terribly, desperately addicted to eggs."
+        )
+        await ctx.send(
+            "{mention}, congratulations! You've joined {eggsmention}! For more information about eggs,"
+            "please visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
+                mention=ctx.author.mention, eggsmention=eggsrole.mention
+            )
+        )
     else:
         await ctx.send(
             "{mention}, that is not the correct answer.".format(
