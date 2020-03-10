@@ -27,6 +27,7 @@ from discord.ext import commands
 from time import sleep
 
 token = None
+guild_name = None
 welcomechannel_name = "welcome"
 memberrole_name = "Members"
 memberchannel_name = "general"
@@ -74,6 +75,11 @@ except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
 
 try:
+    guild_name = os.environ["GUILD_NAME"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
     welcomechannel_name = os.environ["WELCOMECHANNEL_NAME"]
 except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
@@ -107,6 +113,7 @@ parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
 parser.add_argument("-t", "--token", help="Discord API Token", required=token == "")
+parser.add_argument("-g", "--guild", help="Guild Name", required=guild_name == "")
 parser.add_argument(
     "--welcome-channel", help="Welcome Channel Name (No #)", default=welcomechannel_name
 )
@@ -122,6 +129,9 @@ parser.add_argument(
     "--bot-description", help="Bot Description", default=bot_description
 )
 args = vars(parser.parse_args())
+if "guild" in args and args["guild"] is not None:
+    guild_name = args["guild"]
+
 if "welcome_channel" in args and args["welcome_channel"] is not None:
     welcomechannel_name = args["welcome_channel"]
 
@@ -168,7 +178,7 @@ async def on_ready():
     # TODO: De-hardcode
     global welcomechannel
     welcomechannel = discord.utils.get(
-        bot.get_all_channels(), guild__name="Networking", name=welcomechannel_name
+        bot.get_all_channels(), guild__name=guild_name, name=welcomechannel_name
     )
     print(
         "Welcome Channel: {welcomechannel_name} (ID: {welcomechannel_id})".format(
@@ -184,7 +194,7 @@ async def on_ready():
     )
     global memberchannel
     memberchannel = discord.utils.get(
-        bot.get_all_channels(), guild__name="Networking", name=memberchannel_name
+        bot.get_all_channels(), guild__name=guild_name, name=memberchannel_name
     )
     print(
         "Member Channel: {memberchannel_name} (ID: {memberchannel_id})".format(
@@ -193,7 +203,7 @@ async def on_ready():
     )
     global logchannel
     logchannel = discord.utils.get(
-        bot.get_all_channels(), guild__name="Networking", name=logchannel_name
+        bot.get_all_channels(), guild__name=guild_name, name=logchannel_name
     )
     print(
         "Log Channel: {logchannel_name} (ID: {logchannel_id})".format(
@@ -239,7 +249,7 @@ async def accept(ctx, *args: str):
             )
     else:
         await ctx.send(
-            "{mention}, that is not the correct answer.`".format(
+            "{mention}, that is not the correct answer.".format(
                 mention=ctx.author.mention
             )
         )
