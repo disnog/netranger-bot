@@ -27,6 +27,7 @@ from discord.ext import commands
 
 token = None
 welcomechannel_name = "welcome"
+memberrole_name = "Members"
 logchannel_name = "mods-cnc"
 command_prefix = "$"
 welcome_message = "Hi {mention}, welcome to {server}!"
@@ -41,6 +42,11 @@ except KeyError as e:
 
 try:
     welcomechannel_name = os.environ["WELCOMECHANNEL_NAME"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
+    memberrole_name = os.environ["MEMBERROLE_NAME"]
 except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
 
@@ -69,8 +75,9 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("-t", "--token", help="Discord API Token", required=token == "")
 parser.add_argument(
-    "--welcome-channel", help="Welcome Channel", default=welcomechannel_name
+    "--welcome-channel", help="Welcome Channel Name (No #)", default=welcomechannel_name
 )
+parser.add_argument("--member-role", help="Member Role Name", default=memberrole_name)
 parser.add_argument("--log-channel", help="Log Channel", default=logchannel_name)
 parser.add_argument(
     "--welcome-message", help="Welcome Message", default=welcome_message
@@ -82,6 +89,9 @@ parser.add_argument(
 args = vars(parser.parse_args())
 if "welcome_channel" in args and args["welcome_channel"] is not None:
     welcomechannel_name = args["welcome_channel"]
+
+if "member_role" in args and args["member_role"] is not None:
+    memberrole_name = args["member_role"]
 
 if "log_channel" in args and args["log_channel"] is not None:
     logchannel_name = args["log_channel"]
@@ -130,6 +140,13 @@ async def on_ready():
             welcomechannel_name=welcomechannel.name, welcomechannel_id=welcomechannel.id
         )
     )
+    global memberrole
+    memberrole = discord.utils.get(welcomechannel.guild.roles, name=memberrole_name)
+    print(
+        "Member Role: {memberrole_name} (ID: {memberrole_id})".format(
+            memberrole_name=memberrole.name, memberrole_id=memberrole.id
+        )
+    )
     global logchannel
     logchannel = discord.utils.get(
         bot.get_all_channels(), guild__name="Networking", name=logchannel_name
@@ -154,6 +171,28 @@ async def info(ctx):
         name="Github", value="https://github.com/networking-discord/network-ranger"
     )
     await ctx.send(embed=embed)
+
+
+@bot.command(help="Answer the challenge question in #{}".format(welcomechannel_name))
+async def accept(ctx, *args: str):
+    global x
+    await ctx.message.delete()
+    if not len(args):
+        await ctx.send(
+            "{mention}, you've forgotten to answer your assigned question. Try: `!accept <ANSWER>`".format(
+                mention=ctx.author.mention
+            )
+        )
+    elif args[0] in ["28", "/28", "<28>", "</28>"]:
+        await ctx.author.add_roles(
+            memberrole, reason="Accepted rules; Answer: " + args[0]
+        )
+    else:
+        await ctx.send(
+            "{mention}, that is not the correct answer.`".format(
+                mention=ctx.author.mention
+            )
+        )
 
 
 @bot.event
@@ -181,16 +220,6 @@ async def on_member_join(member):
 #
 #     if message.content.startswith(command_prefix):
 #         return
-
-
-async def process_command(message):
-    """
-    Process commands prefixed with command_prefix.
-    :param message:
-    :return:
-    """
-    command = message.content.lstrip(command_prefix).split()
-    await message.channel.send("You said: {}".format(" ".join(command)))
 
 
 bot.run(token)
