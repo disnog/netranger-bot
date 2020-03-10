@@ -179,8 +179,8 @@ async def accept(ctx, *args: str):
     await ctx.message.delete()
     if not len(args):
         await ctx.send(
-            "{mention}, you've forgotten to answer your assigned question. Try: `!accept <ANSWER>`".format(
-                mention=ctx.author.mention
+            "{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
+                mention=ctx.author.mention, command_prefix=command_prefix
             )
         )
     elif args[0] in ["28", "/28", "<28>", "</28>"]:
