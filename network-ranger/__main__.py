@@ -32,8 +32,39 @@ memberrole_name = "Members"
 memberchannel_name = "general"
 logchannel_name = "mods-cnc"
 command_prefix = "$"
-welcome_message = "Hi {mention}, welcome to {server}!"
 bot_description = "The Networking Discord Bot"
+
+# TODO: Unfortunately this just isn't going to work with environment variables. We'll need to handle it via external storage once added.
+welcome_message = """Hi {mention}, welcome to the {server} Discord server. Please _read_ and accept the rules to be permitted into the rest of the server.
+
+We'd ask that you observe the following guidelines for this server:
+
+__**This is a place for:**__
+:white_check_mark:  networking professionals to gather and share thoughts and knowledge.
+:white_check_mark:  those who want to enter the networking profession to gain exposure.
+:white_check_mark:  perhaps griping about the latest Cisco bug or mismanagement priority.
+:white_check_mark:  students and others looking to enter the profession to gain exposure and exchange knowledge.
+
+__**This is not a place intended for:**__
+:no_entry: server administration
+:no_entry: home networking
+:no_entry: [non-network] programming
+:no_entry: non-networking IT disciplines
+
+__**General rules:**__
+- No cheating, whatsoever.  Asking for or distributing braindumps will result in an immediate ban.
+- Keep this place 100% safe for work.
+- Please attempt to use the appropriate channel for your discussion.
+- Treat everyone with respect.
+- No random/unprompted DMs. (Excepting DMs to mods/admins regarding the Discord server)
+
+__**To gain access to the rest of the server**__
+- Once you gain access to the rest of the server, you will lose access to #welcome.  The guidelines and rules will always be available via a pinned post in #general.
+- If you agree to the rules above and they are in line with your intended use of this server, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`. No special characters other than the required `{command_prefix}` should be used.
+```
+What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
+```
+"""
 
 # TODO: Handle these in a loop
 # TODO: Document environment variables
@@ -72,11 +103,6 @@ try:
 except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
 
-try:
-    welcome_message = os.environ["WELCOME_MESSAGE"]
-except KeyError as e:
-    print("Warning: Environment variable", e.args[0], "not defined")
-
 parser = argparse.ArgumentParser(
     fromfile_prefix_chars="@", formatter_class=argparse.RawTextHelpFormatter
 )
@@ -90,9 +116,6 @@ parser.add_argument(
 )
 parser.add_argument(
     "--log-channel", help="Log Channel Name (No #)", default=logchannel_name
-)
-parser.add_argument(
-    "--welcome-message", help="Welcome Message", default=welcome_message
 )
 parser.add_argument("--command-prefix", help="Command Prefix", default=command_prefix)
 parser.add_argument(
@@ -110,9 +133,6 @@ if "member_channel" in args and args["member_channel"] is not None:
 
 if "log_channel" in args and args["log_channel"] is not None:
     logchannel_name = args["log_channel"]
-
-if "welcome_message" in args and args["welcome_message"] is not None:
-    welcome_message = args["welcome_message"]
 
 if "command_prefix" in args and args["command_prefix"] is not None:
     command_prefix = args["command_prefix"]
@@ -233,7 +253,11 @@ async def on_member_join(member):
     :return:
     """
     await welcomechannel.send(
-        welcome_message.format(server=member.guild.name, mention=member.mention)
+        welcome_message.format(
+            server=member.guild.name,
+            mention=member.mention,
+            command_prefix=command_prefix,
+        )
     )
 
 
