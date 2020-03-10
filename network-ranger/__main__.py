@@ -24,10 +24,12 @@ import discord
 import argparse
 import os
 from discord.ext import commands
+from time import sleep
 
 token = None
 welcomechannel_name = "welcome"
 memberrole_name = "Members"
+memberchannel_name = "general"
 logchannel_name = "mods-cnc"
 command_prefix = "$"
 welcome_message = "Hi {mention}, welcome to {server}!"
@@ -47,6 +49,11 @@ except KeyError as e:
 
 try:
     memberrole_name = os.environ["MEMBERROLE_NAME"]
+except KeyError as e:
+    print("Warning: Environment variable", e.args[0], "not defined")
+
+try:
+    memberchannel_name = os.environ["MEMBERCHANNEL_NAME"]
 except KeyError as e:
     print("Warning: Environment variable", e.args[0], "not defined")
 
@@ -78,7 +85,12 @@ parser.add_argument(
     "--welcome-channel", help="Welcome Channel Name (No #)", default=welcomechannel_name
 )
 parser.add_argument("--member-role", help="Member Role Name", default=memberrole_name)
-parser.add_argument("--log-channel", help="Log Channel", default=logchannel_name)
+parser.add_argument(
+    "--member-channel", help="Member Channel Name (No #)", default=memberchannel_name
+)
+parser.add_argument(
+    "--log-channel", help="Log Channel Name (No #)", default=logchannel_name
+)
 parser.add_argument(
     "--welcome-message", help="Welcome Message", default=welcome_message
 )
@@ -92,6 +104,9 @@ if "welcome_channel" in args and args["welcome_channel"] is not None:
 
 if "member_role" in args and args["member_role"] is not None:
     memberrole_name = args["member_role"]
+
+if "member_channel" in args and args["member_channel"] is not None:
+    memberchannel_name = args["member_channel"]
 
 if "log_channel" in args and args["log_channel"] is not None:
     logchannel_name = args["log_channel"]
@@ -147,6 +162,15 @@ async def on_ready():
             memberrole_name=memberrole.name, memberrole_id=memberrole.id
         )
     )
+    global memberchannel
+    memberchannel = discord.utils.get(
+        bot.get_all_channels(), guild__name="Networking", name=memberchannel_name
+    )
+    print(
+        "Member Channel: {memberchannel_name} (ID: {memberchannel_id})".format(
+            memberchannel_name=memberchannel.name, memberchannel_id=memberchannel.id
+        )
+    )
     global logchannel
     logchannel = discord.utils.get(
         bot.get_all_channels(), guild__name="Networking", name=logchannel_name
@@ -175,7 +199,6 @@ async def info(ctx):
 
 @bot.command(help="Answer the challenge question in #{}".format(welcomechannel_name))
 async def accept(ctx, *args: str):
-    global x
     await ctx.message.delete()
     if not len(args):
         await ctx.send(
@@ -187,6 +210,13 @@ async def accept(ctx, *args: str):
         await ctx.author.add_roles(
             memberrole, reason="Accepted rules; Answer: " + args[0]
         )
+        async with memberchannel.typing():
+            sleep(7)
+            await memberchannel.send(
+                "{mention}, welcome to {server}! Glad to have you. Feel free to take a moment to introduce yourself!".format(
+                    mention=ctx.author.mention, server=memberchannel.guild.name
+                )
+            )
     else:
         await ctx.send(
             "{mention}, that is not the correct answer.`".format(
