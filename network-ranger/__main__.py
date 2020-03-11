@@ -270,7 +270,7 @@ async def accept(ctx, *args: str):
         )
         await ctx.send(
             "{mention}, congratulations! You've joined {eggsmention}! For more information about eggs,"
-            "please visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
+            " please visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
                 mention=ctx.author.mention, eggsmention=eggsrole.mention
             )
         )
