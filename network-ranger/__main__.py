@@ -246,6 +246,8 @@ async def info(ctx):
 
 @bot.command(help="Answer the challenge question in #{}".format(welcomechannel_name))
 async def accept(ctx, *args: str):
+    if ctx.channel != welcomechannel:
+        return
     await ctx.message.delete()
     if not len(args):
         await ctx.send(
