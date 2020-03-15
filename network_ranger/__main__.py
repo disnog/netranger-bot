@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#  network-ranger - __main__.py
+#  network_ranger - __main__.py
 #  Copyright (C) 2019  Jason R. Rokeach
 #
 #  This program is free software: you can redistribute it and/or modify
