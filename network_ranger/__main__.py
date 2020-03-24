@@ -64,7 +64,7 @@ async def on_ready():
     )
     print(
         "Member Role: {memberrole_name} (ID: {memberrole_id})".format(
-            memberrole_name=conf.get("memberrole.name"), memberrole_id=memberrole.id
+            memberrole_name=memberrole.name, memberrole_id=memberrole.id
         )
     )
     global memberchannel
