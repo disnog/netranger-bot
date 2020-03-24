@@ -123,13 +123,11 @@ async def accept(ctx, *args: str):
         await ctx.author.add_roles(
             memberrole, reason="Accepted rules; Answer: " + args[0]
         )
-        async with memberchannel.typing():
-            sleep(7)
-            await memberchannel.send(
-                "{mention}, welcome to {server}! Glad to have you. Feel free to take a moment to introduce yourself!".format(
-                    mention=ctx.author.mention, server=memberchannel.guild.name
-                )
+        await memberchannel.send(
+            "{mention}, welcome to {server}! Glad to have you. Feel free to take a moment to introduce yourself!".format(
+                mention=ctx.author.mention, server=memberchannel.guild.name
             )
+        )
     else:
         await ctx.send(
             "{mention}, that is not the correct answer. Please try again once the timer allows.".format(
