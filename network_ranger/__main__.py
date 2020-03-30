@@ -22,7 +22,6 @@ Discord bot to maintain the Networking Discord Server.
 
 import discord
 from discord.ext import commands
-from time import sleep
 import classes
 
 conf = classes.Config()
@@ -142,7 +141,7 @@ async def accept(ctx, *args: str):
 async def on_member_join(member):
     """
     Handle users joining the server.
-    :param message:
+    :param member:
     :return:
     """
     await welcomechannel.send(
