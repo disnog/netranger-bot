@@ -124,8 +124,10 @@ async def accept(ctx, *args: str):
             memberrole, reason="Accepted rules; Answer: " + args[0]
         )
         await memberchannel.send(
-            "{mention}, welcome to {server}! Glad to have you. Feel free to take a moment to introduce yourself!".format(
-                mention=ctx.author.mention, server=memberchannel.guild.name
+            "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to take a moment to introduce yourself!".format(
+                mention=ctx.author.mention,
+                server=memberchannel.guild.name,
+                membernumber=len(memberrole.members),
             )
         )
     else:
