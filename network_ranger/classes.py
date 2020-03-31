@@ -36,7 +36,7 @@ class Config:
         self.config = dict()
 
         # TODO: Un-hardcode this
-        welcomemessage_default = """Hi {mention}, welcome to the {server} Discord server. Please _read_ and accept the rules to be permitted into the rest of the server.
+        welcomemessage_default = """Hi {mention}, welcome to {server}. Please _read_ and accept the rules to fully join.
 
                 We'd ask that you observe the following guidelines for this server:
 
@@ -60,8 +60,8 @@ class Config:
                 - No random/unprompted DMs. (Excepting DMs to mods/admins regarding the Discord server)
 
                 __**To gain access to the rest of the server**__
-                - Once you gain access to the rest of the server, you will lose access to #welcome.  The guidelines and rules will always be available via a pinned post in #general.
-                - If you agree to the rules above and they are in line with your intended use of this server, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`. No special characters other than the required `{command_prefix}` should be used.
+                - Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
+                - If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`.
                 ```
                 What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
                 ```
