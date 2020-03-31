@@ -23,6 +23,7 @@ Discord bot to maintain the Networking Discord Server.
 import discord
 from discord.ext import commands
 import classes
+from datetime import datetime
 
 conf = classes.Config()
 
@@ -91,6 +92,23 @@ async def on_ready():
     await logchannel.send(
         "Bot Online. Command prefix: {command_prefix}".format(
             command_prefix=conf.get("command_prefix")
+        )
+    )
+    # Build a list of members to kick if they've been sitting in the welcome channel more than 7 days.
+    members_to_prune = list()
+    for member in welcomechannel.members:
+        if (
+            memberrole not in member.roles
+            and (datetime.now() - member.joined_at).days >= 3
+            and not member.bot
+        ):
+            members_to_prune.append(member)
+    await logchannel.send(
+        "I'll soon prune the following non-members lingering > 3 days unless they accept: {}".format(
+            [
+                (member.mention, str((datetime.now() - member.joined_at).days) + "days")
+                for member in members_to_prune
+            ]
         )
     )
 
