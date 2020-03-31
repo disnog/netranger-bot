@@ -103,7 +103,7 @@ async def on_ready():
             and not member.bot
         ):
             members_to_prune.append(member)
-    await logchannel.send(
+    await welcomechannel.send(
         "I'll soon prune the following non-members lingering > 3 days unless they accept: {}".format(
             [
                 (member.mention, str((datetime.now() - member.joined_at).days) + "days")
