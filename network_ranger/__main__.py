@@ -163,7 +163,7 @@ async def on_member_join(member):
     :return:
     """
     await welcomechannel.send(
-        conf.get("welcome_message").format(
+        conf.get("welcomemessage").format(
             server=member.guild.name,
             mention=member.mention,
             command_prefix=conf.get("command_prefix"),
