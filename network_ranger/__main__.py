@@ -39,6 +39,18 @@ bot = commands.Bot(
 )
 
 
+async def is_guild_admin(ctx):
+    return ctx.author.guild_permissions.administrator
+
+
+async def is_guild_mod(ctx):
+    return ctx.author.guild_permissions.ban_members
+
+
+async def is_not_accepted(ctx):
+    return memberrole not in ctx.author.roles
+
+
 @bot.event
 async def on_ready():
     print(
@@ -114,6 +126,7 @@ async def on_ready():
 
 
 @bot.command(help="Shows bot information")
+@commands.check(is_guild_mod)
 async def info(ctx):
     embed = discord.Embed(
         title="Network Ranger", description=conf.get("bot_description")
@@ -128,6 +141,7 @@ async def info(ctx):
 @bot.command(
     help="Answer the challenge question in #{}".format(conf.get("welcomechannel_name"))
 )
+@commands.check(is_not_accepted)
 async def accept(ctx, *args: str):
     await ctx.message.delete()
     if not len(args):
