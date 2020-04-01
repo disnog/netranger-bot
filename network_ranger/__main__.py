@@ -38,7 +38,7 @@ bot = commands.Bot(
     ),
 )
 
-
+# Define predicates for bot commands checks
 async def is_guild_admin(ctx):
     return ctx.author.guild_permissions.administrator
 
@@ -49,6 +49,10 @@ async def is_guild_mod(ctx):
 
 async def is_not_accepted(ctx):
     return memberrole not in ctx.author.roles
+
+
+async def is_accepted(ctx):
+    return memberrole in ctx.author.roles
 
 
 @bot.event
