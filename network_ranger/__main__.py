@@ -24,6 +24,7 @@ import discord
 from discord.ext import commands
 import classes
 from datetime import datetime
+import asyncio
 
 conf = classes.Config()
 
@@ -147,7 +148,6 @@ async def info(ctx):
 )
 @commands.check(is_not_accepted)
 async def accept(ctx, *args: str):
-    await ctx.message.delete()
     if not len(args):
         await ctx.send(
             "{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
@@ -190,18 +190,19 @@ async def on_member_join(member):
 
 
 # TODO: Enable this in a way that doesn't interfere with command processing.
-# @bot.event
-# async def on_message(message):
-#     """
-#     Handle incoming messages.
-#     :param message:
-#     :return:
-#     """
-#     if message.author == bot.user:
-#         return
-#
-#     if message.content.startswith(command_prefix):
-#         return
+@bot.event
+async def on_message(message):
+    """
+    Handle incoming messages.
+    :param message:
+    :return:
+    """
+    await asyncio.create_task(bot.process_commands(message))
+    if message.author == bot.user:
+        return
+
+    if message.channel is welcomechannel:
+        await message.delete()
 
 
 bot.run(conf.get("token"))
