@@ -86,6 +86,9 @@ What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
             "logchannel_name": Config.VarDef(
                 value="test-cnc", environ="LOGCHANNEL_NAME"
             ),
+            "mirrorchannel_name": Config.VarDef(
+                value="mirror", environ="MIRRORCHANNEL_NAME"
+            ),
             "bot_description": Config.VarDef(
                 value="Network Ranger", environ="BOT_DESCRIPTION"
             ),
