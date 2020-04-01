@@ -106,6 +106,17 @@ async def on_ready():
             logchannel_name=logchannel.name, logchannel_id=logchannel.id
         )
     )
+    global mirrorchannel
+    mirrorchannel = discord.utils.get(
+        bot.get_all_channels(),
+        guild__name=conf.get("guild_name"),
+        name=conf.get("mirrorchannel_name"),
+    )
+    print(
+        "Mirror Channel: {mirrorchannel_name} (ID: {mirrorchannel_id})".format(
+            mirrorchannel_name=mirrorchannel.name, mirrorchannel_id=mirrorchannel.id
+        )
+    )
     await logchannel.send(
         "Bot Online. Command prefix: {command_prefix}".format(
             command_prefix=conf.get("command_prefix")
@@ -202,6 +213,10 @@ async def on_message(message):
         return
 
     if message.channel is welcomechannel:
+        embed = discord.Embed()
+        embed.add_field(name="User", value=message.author.name)
+        embed.add_field(name="Message", value=message.clean_content)
+        await mirrorchannel.send(embed=embed)
         await message.delete()
 
 
