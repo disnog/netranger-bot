@@ -38,34 +38,34 @@ class Config:
         # TODO: Un-hardcode this
         welcomemessage_default = """Hi {mention}, welcome to {server}. Please _read_ and accept the rules to fully join.
 
-                We'd ask that you observe the following guidelines for this server:
+We'd ask that you observe the following guidelines for this server:
 
-                __**This is a place for:**__
-                :white_check_mark:  networking professionals to gather and share thoughts and knowledge.
-                :white_check_mark:  those who want to enter the networking profession to gain exposure.
-                :white_check_mark:  perhaps griping about the latest Cisco bug or mismanagement priority.
-                :white_check_mark:  students and others looking to enter the profession to gain exposure and exchange knowledge.
+__**This is a place for:**__
+:white_check_mark:  networking professionals to gather and share thoughts and knowledge.
+:white_check_mark:  those who want to enter the networking profession to gain exposure.
+:white_check_mark:  perhaps griping about the latest Cisco bug or mismanagement priority.
+:white_check_mark:  students and others looking to enter the profession to gain exposure and exchange knowledge.
 
-                __**This is not a place intended for:**__
-                :no_entry: server administration
-                :no_entry: home networking
-                :no_entry: [non-network] programming
-                :no_entry: non-networking IT disciplines
+__**This is not a place intended for:**__
+:no_entry: server administration
+:no_entry: home networking
+:no_entry: [non-network] programming
+:no_entry: non-networking IT disciplines
 
-                __**General rules:**__
-                - No cheating, whatsoever.  Asking for or distributing braindumps will result in an immediate ban.
-                - Keep this place 100% safe for work.
-                - Please attempt to use the appropriate channel for your discussion.
-                - Treat everyone with respect.
-                - No random/unprompted DMs. (Excepting DMs to mods/admins regarding the Discord server)
+__**General rules:**__
+- No cheating, whatsoever.  Asking for or distributing braindumps will result in an immediate ban.
+- Keep this place 100% safe for work.
+- Please attempt to use the appropriate channel for your discussion.
+- Treat everyone with respect.
+- No random/unprompted DMs. (Excepting DMs to mods/admins regarding the Discord server)
 
-                __**To gain access to the rest of the server**__
-                - Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
-                - If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`.
-                ```
-                What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
-                ```
-                """
+__**To gain access to the rest of the server**__
+- Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
+- If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`.
+```
+What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
+```
+"""
         self.config = {
             "welcomemessage": Config.VarDef(
                 # Only consider this sensitive because it would create some very long log output.
@@ -85,6 +85,9 @@ class Config:
             ),
             "logchannel_name": Config.VarDef(
                 value="test-cnc", environ="LOGCHANNEL_NAME"
+            ),
+            "mirrorchannel_name": Config.VarDef(
+                value="mirror", environ="MIRRORCHANNEL_NAME"
             ),
             "bot_description": Config.VarDef(
                 value="Network Ranger", environ="BOT_DESCRIPTION"

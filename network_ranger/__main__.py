@@ -24,6 +24,7 @@ import discord
 from discord.ext import commands
 import classes
 from datetime import datetime
+import asyncio
 
 conf = classes.Config()
 
@@ -37,6 +38,22 @@ bot = commands.Bot(
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
+
+# Define predicates for bot commands checks
+async def is_guild_admin(ctx):
+    return ctx.author.guild_permissions.administrator
+
+
+async def is_guild_mod(ctx):
+    return ctx.author.guild_permissions.ban_members
+
+
+async def is_not_accepted(ctx):
+    return memberrole not in ctx.author.roles
+
+
+async def is_accepted(ctx):
+    return memberrole in ctx.author.roles
 
 
 @bot.event
@@ -89,6 +106,17 @@ async def on_ready():
             logchannel_name=logchannel.name, logchannel_id=logchannel.id
         )
     )
+    global mirrorchannel
+    mirrorchannel = discord.utils.get(
+        bot.get_all_channels(),
+        guild__name=conf.get("guild_name"),
+        name=conf.get("mirrorchannel_name"),
+    )
+    print(
+        "Mirror Channel: {mirrorchannel_name} (ID: {mirrorchannel_id})".format(
+            mirrorchannel_name=mirrorchannel.name, mirrorchannel_id=mirrorchannel.id
+        )
+    )
     await logchannel.send(
         "Bot Online. Command prefix: {command_prefix}".format(
             command_prefix=conf.get("command_prefix")
@@ -114,6 +142,7 @@ async def on_ready():
 
 
 @bot.command(help="Shows bot information")
+@commands.check(is_guild_mod)
 async def info(ctx):
     embed = discord.Embed(
         title="Network Ranger", description=conf.get("bot_description")
@@ -128,8 +157,8 @@ async def info(ctx):
 @bot.command(
     help="Answer the challenge question in #{}".format(conf.get("welcomechannel_name"))
 )
+@commands.check(is_not_accepted)
 async def accept(ctx, *args: str):
-    await ctx.message.delete()
     if not len(args):
         await ctx.send(
             "{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
@@ -172,18 +201,23 @@ async def on_member_join(member):
 
 
 # TODO: Enable this in a way that doesn't interfere with command processing.
-# @bot.event
-# async def on_message(message):
-#     """
-#     Handle incoming messages.
-#     :param message:
-#     :return:
-#     """
-#     if message.author == bot.user:
-#         return
-#
-#     if message.content.startswith(command_prefix):
-#         return
+@bot.event
+async def on_message(message):
+    """
+    Handle incoming messages.
+    :param message:
+    :return:
+    """
+    await asyncio.create_task(bot.process_commands(message))
+    if message.author == bot.user:
+        return
+
+    if message.channel is welcomechannel:
+        embed = discord.Embed()
+        embed.add_field(name="User", value=message.author.name)
+        embed.add_field(name="Message", value=message.clean_content)
+        await mirrorchannel.send(embed=embed)
+        await message.delete()
 
 
 bot.run(conf.get("token"))
