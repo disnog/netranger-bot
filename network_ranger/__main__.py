@@ -56,6 +56,58 @@ async def is_accepted(ctx):
     return memberrole in ctx.author.roles
 
 
+async def prune_non_members():
+    # Build a list of members to kick if they've been sitting in the welcome channel more than 3 days.
+    warning_seconds = 172800
+    kick_seconds = 259200
+    for member in welcomechannel.members:
+        if memberrole not in member.roles and not member.bot:
+            time_on_server = datetime.utcnow() - member.joined_at
+            if 0 <= time_on_server.total_seconds() - warning_seconds < 60:
+                # Warn them that they're going to be kicked if they continue to idle.
+                await welcomechannel.send(
+                    "{mention}, you've been idling in {welcome_channel} for {time}. If you do not "
+                    "`{command_prefix}accept`, you will be removed and will need to rejoin.".format(
+                        mention=member.mention,
+                        welcome_channel=welcomechannel.name,
+                        time=time_on_server,
+                        command_prefix=conf.get("command_prefix"),
+                    )
+                )
+            if time_on_server.total_seconds() > kick_seconds:
+                # Kick the user for not accepting.
+                try:
+                    await member.send(
+                        "You are being removed from {server} because you have not accepted the rules. We'd still love"
+                        " to have you if you're interested in network engineering. If you wish to rejoin, please feel"
+                        " free to do so using the join link at {url}.".format(
+                            server=conf.get("guild_name"),
+                            url="https://networking-discord.github.io",
+                        )
+                    )
+                except discord.errors.Forbidden:
+                    pass
+                except discord.errors.HTTPException:
+                    pass
+                try:
+                    await welcomechannel.guild.kick(
+                        member,
+                        reason="Did not accept the rules in {time}".format(
+                            time=time_on_server
+                        ),
+                    )
+                except discord.errors.Forbidden:
+                    pass
+                except discord.errors.HTTPException:
+                    pass
+
+
+async def every_minute():
+    while True:
+        await asyncio.create_task(prune_non_members())
+        await asyncio.sleep(60)
+
+
 @bot.event
 async def on_ready():
     print(
@@ -122,23 +174,8 @@ async def on_ready():
             command_prefix=conf.get("command_prefix")
         )
     )
-    # Build a list of members to kick if they've been sitting in the welcome channel more than 7 days.
-    members_to_prune = list()
-    for member in welcomechannel.members:
-        if (
-            memberrole not in member.roles
-            and (datetime.now() - member.joined_at).days >= 3
-            and not member.bot
-        ):
-            members_to_prune.append(member)
-    await welcomechannel.send(
-        "I'll soon prune the following non-members lingering > 3 days unless they accept: {}".format(
-            [
-                (member.mention, str((datetime.now() - member.joined_at).days) + "days")
-                for member in members_to_prune
-            ]
-        )
-    )
+    # Start routine maintenance timer
+    await asyncio.create_task(every_minute())
 
 
 @bot.command(help="Shows bot information")
