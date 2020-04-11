@@ -194,6 +194,21 @@ async def info(ctx):
 @bot.command(
     help="Answer the challenge question in #{}".format(conf.get("welcomechannel_name"))
 )
+
+@bot.command()
+# Example usecase -ipcalc 10.10.15.12/27
+async def ipcalc(ctx, *, user_subnet):
+
+    subnet_1 = ipcalc.Network(user_subnet)
+
+    await ctx.send(
+    print("Network:", subnet_1.network(), subnet_1.netmask())
+    print("Network Adress:", subnet_1.network())
+    print("Broadcast adress:", subnet_1.broadcast())
+    print("First usable host in subnet:", subnet_1.host_first())
+    print("Last usable host in subnet:", subnet_1.host_last())
+)
+    
 @commands.check(is_not_accepted)
 async def accept(ctx, *args: str):
     if not len(args):
