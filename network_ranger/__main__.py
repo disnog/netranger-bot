@@ -136,6 +136,15 @@ async def on_ready():
             memberrole_name=memberrole.name, memberrole_id=memberrole.id
         )
     )
+    global eggsrole
+    eggsrole = discord.utils.get(
+        welcomechannel.guild.roles, name=conf.get("eggsrole_name")
+    )
+    print(
+        "Member Role: {eggsrole_name} (ID: {eggsrole_id})".format(
+            eggsrole_name=eggsrole.name, eggsrole_id=eggsrole.id
+        )
+    )
     global memberchannel
     memberchannel = discord.utils.get(
         bot.get_all_channels(),
@@ -211,6 +220,16 @@ async def accept(ctx, *args: str):
                 mention=ctx.author.mention,
                 server=memberchannel.guild.name,
                 membernumber=len(memberrole.members),
+            )
+        )
+    elif args[0] == "eggs":
+        await ctx.author.add_roles(
+            eggsrole, reason="Really, terribly, desperately addicted to eggs."
+        )
+        await ctx.send(
+            "{mention}, congratulations! You've joined {eggsmention}! For more information about eggs,"
+            " please visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
+                mention=ctx.author.mention, eggsmention=eggsrole.mention
             )
         )
     else:
