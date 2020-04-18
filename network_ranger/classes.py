@@ -77,6 +77,7 @@ What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
             "welcomechannel_name": Config.VarDef(
                 value="test-welcome", environ="WELCOMECHANNEL_NAME"
             ),
+            "eggsrole_name": Config.VarDef(value="!eggs", environ="EGGSROLE_NAME"),
             "memberrole_name": Config.VarDef(
                 value="Members", environ="MEMBERROLE_NAME"
             ),
