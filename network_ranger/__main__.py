@@ -56,6 +56,16 @@ async def is_accepted(ctx):
     return memberrole in ctx.author.roles
 
 
+async def process_noncommands(message):
+    if message.channel is welcomechannel:
+        embed = discord.Embed()
+        embed.add_field(name="User", value=message.author.name)
+        embed.add_field(name="Message", value=message.clean_content)
+        await mirrorchannel.send(embed=embed)
+        if message.author != bot.user:
+            await message.delete()
+
+
 async def prune_non_members():
     # Build a list of members to kick if they've been sitting in the welcome channel more than 3 days.
     warning_seconds = 172800
@@ -207,7 +217,7 @@ async def info(ctx):
 async def accept(ctx, *args: str):
     if not len(args):
         await ctx.send(
-            "{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
+            "*****{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
                 mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
             )
         )
@@ -226,15 +236,16 @@ async def accept(ctx, *args: str):
         await ctx.author.add_roles(
             eggsrole, reason="Really, terribly, desperately addicted to eggs."
         )
-        await ctx.send(
-            "{mention}, congratulations! You've joined {eggsmention}! For more information about eggs,"
-            " please visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
+        response = (
+            "*****{mention}, congratulations! You've joined {eggsmention}! For more information about eggs, please "
+            "visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
                 mention=ctx.author.mention, eggsmention=eggsrole.mention
             )
         )
+        await ctx.send(response)
     else:
         await ctx.send(
-            "{mention}, that is not the correct answer. Please try again once the timer allows.".format(
+            "*****{mention}, that is not the correct answer. Please try again once the timer allows.".format(
                 mention=ctx.author.mention
             )
         )
@@ -256,7 +267,6 @@ async def on_member_join(member):
     )
 
 
-# TODO: Enable this in a way that doesn't interfere with command processing.
 @bot.event
 async def on_message(message):
     """
@@ -264,16 +274,13 @@ async def on_message(message):
     :param message:
     :return:
     """
-    await asyncio.create_task(bot.process_commands(message))
-    if message.author == bot.user:
+    # Don't do anything if the author is the bot itself unless the message content starts with "*****"
+    if message.author == bot.user and not message.clean_content.startswith("*****"):
         return
-
-    if message.channel is welcomechannel:
-        embed = discord.Embed()
-        embed.add_field(name="User", value=message.author.name)
-        embed.add_field(name="Message", value=message.clean_content)
-        await mirrorchannel.send(embed=embed)
-        await message.delete()
+    # Process messages that aren't issued as commands
+    await asyncio.create_task(process_noncommands(message))
+    # Process commands using the discord.py bot module
+    await asyncio.create_task(bot.process_commands(message))
 
 
 bot.run(conf.get("token"))
