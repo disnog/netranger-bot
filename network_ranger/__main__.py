@@ -25,6 +25,7 @@ from discord.ext import commands
 import classes
 from datetime import datetime
 import asyncio
+import subnet_calc
 
 conf = classes.Config()
 
@@ -249,6 +250,34 @@ async def accept(ctx, *args: str):
                 mention=ctx.author.mention
             )
         )
+
+@bot.command(name="ipcalc", aliases=["ipc", "ipcalculator"], help="ipcalc")
+@commands.check(is_an_appropriate_channel)
+async def ipcalculator_command(ctx, *args: str):
+    argumentList = args
+
+    if not len(args):
+        await ctx.send("No input added, please use following syntax:",
+                       "-ipc 10.12.13.4/27",
+                       "or",
+                       "-ipc 10.12.13.4 255.255.255.224", sep="\n")
+
+    elif len(args) > 0:
+        await memberchannel.send(subnet_calc_function())
+
+
+@bot.command(name="ipcalc_collision_check", aliases=["ipcc", "ipc_collision"], help="ipcalc_collission_check")
+@commands.check(is_an_appropriate_channel)
+async def ipc_subnet_collision_checker_command(ctx, *args: str):
+    argumentList = args
+
+    if not len(args):
+        await ctx.send("No input added, please use following syntax:",
+                       "-ipcc 10.12.13.4/27 10.12.13.17/28", sep="\n")
+
+    elif len(args) > 0:
+        await memberchannel.send(subnet_collision_checker_function())
+
 
 
 @bot.event
