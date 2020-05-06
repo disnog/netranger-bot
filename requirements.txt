@@ -7,3 +7,5 @@ idna==2.9
 multidict==4.7.5
 websockets==8.1
 yarl==1.4.2
+ipcalc==1.99.0
+six
