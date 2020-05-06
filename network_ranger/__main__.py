@@ -216,10 +216,7 @@ async def ip_calc(ctx, *args: str):
     subnet_calc.argumentList = args
     result = subnet_calc.subnet_calc_function()
 
-    embed = discord.Embed(
-        title = "IP Calculator",
-        description="Standard IP Subnet Calc"
-    )
+    embed = discord.Embed(title="IP Calculator", description="Standard IP Subnet Calc")
     embed.add_field(name="User", value=ctx.author.name)
     embed.add_field(name="Question:", value="{}".format(" ".join(args)))
     embed.add_field(name="Answer:", value=result, inline=False)
@@ -230,15 +227,13 @@ async def ip_calc(ctx, *args: str):
         await ctx.send("`Something went wrong, contact a Mod.`")
 
 
-
 @bot.command(help="IP_Calc collission check feature", aliases=["ipcc"])
 async def ip_collission_check(ctx, *args: str):
     subnet_calc.argumentList = args
     result = subnet_calc.subnet_collision_checker_function()
 
     embed = discord.Embed(
-        title="IP Calculator",
-        description="IP Subnet Collision check feature"
+        title="IP Calculator", description="IP Subnet Collision check feature"
     )
     embed.add_field(name="User", value=ctx.author.name)
     embed.add_field(name="Question:", value="{}".format(" ".join(args)))
