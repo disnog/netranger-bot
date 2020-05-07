@@ -10,8 +10,8 @@ def subnet_calc_function():
             subnet_1 = ipcalc.Network(argumentList[0])
             message = (
                 f"Network: {subnet_1.network()} {subnet_1.netmask()}"
-                f"\nNetwork Adress: {subnet_1.network()}"
-                f"\nBroadcast adress: {subnet_1.broadcast()}"
+                f"\nNetwork Address: {subnet_1.network()}"
+                f"\nBroadcast Address: {subnet_1.broadcast()}"
                 f"\nFirst usable host in subnet: {subnet_1.host_first()}"
                 f"\nLast usable host in subnet: {subnet_1.host_last()}"
             )
@@ -34,8 +34,8 @@ def subnet_calc_function():
             subnet_1 = ipcalc.Network(argumentList[0], argumentList[1])
             message = (
                 f"Network: {subnet_1.network()} {subnet_1.netmask()}"
-                f"\nNetwork Adress: {subnet_1.network()}"
-                f"\nBroadcast adress: {subnet_1.broadcast()}"
+                f"\nNetwork Address: {subnet_1.network()}"
+                f"\nBroadcast Address: {subnet_1.broadcast()}"
                 f"\nFirst usable host in subnet: {subnet_1.host_first()}"
                 f"\nLast usable host in subnet: {subnet_1.host_last()}"
             )
@@ -79,7 +79,7 @@ def subnet_collision_checker_function():
             return error_message
 
 
-# Regular Expression's
+# Regular Expressions
 RP_IPV4FULLMASK = r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)( )((((255\.){3}(255|254|252|248|240|224|192|128|0+))|((255\.){2}(255|254|252|248|240|224|192|128|0+)\.0)|((255\.)(255|254|252|248|240|224|192|128|0+)(\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\.0+){3})))$"
 RP_FULLCIDRv4 = r"^((?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)(\/)(0?[1-9]|[12]\d|3[012]) ?)+$"
 

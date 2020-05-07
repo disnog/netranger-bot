@@ -211,15 +211,27 @@ async def info(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.command(help="IP_Calc feature", aliases=["ipc", "ipcalc"])
+@bot.command(help="Display info on an IP subnet", aliases=["ipc", "ipcalc"])
 async def ip_calc(ctx, *args: str):
+    if not len(args):
+        await ctx.send(
+            "{mention}, this command requires an argument.".format(
+                mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+            )
+        )
+        return
     subnet_calc.argumentList = args
     result = subnet_calc.subnet_calc_function()
 
     embed = discord.Embed(title="IP Calculator", description="Standard IP Subnet Calc")
-    embed.add_field(name="User", value=ctx.author.name)
-    embed.add_field(name="Question:", value="{}".format(" ".join(args)))
-    embed.add_field(name="Answer:", value=result, inline=False)
+    embed.add_field(name="User", value=ctx.author.mention)
+    embed.add_field(
+        name="Question",
+        value="{}".format(
+            discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
+        ),
+    )
+    embed.add_field(name="Answer", value=result, inline=False)
 
     if result:
         await ctx.send(embed=embed)
@@ -227,17 +239,29 @@ async def ip_calc(ctx, *args: str):
         await ctx.send("`Something went wrong, contact a Mod.`")
 
 
-@bot.command(help="IP_Calc collission check feature", aliases=["ipcc"])
-async def ip_collission_check(ctx, *args: str):
+@bot.command(help="Check if two IP subnets overlap", aliases=["ipcc"])
+async def ip_collision_check(ctx, *args: str):
+    if not len(args):
+        await ctx.send(
+            "{mention}, this command requires an argument.".format(
+                mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+            )
+        )
+        return
     subnet_calc.argumentList = args
     result = subnet_calc.subnet_collision_checker_function()
 
     embed = discord.Embed(
         title="IP Calculator", description="IP Subnet Collision check feature"
     )
-    embed.add_field(name="User", value=ctx.author.name)
-    embed.add_field(name="Question:", value="{}".format(" ".join(args)))
-    embed.add_field(name="Answer:", value=result, inline=False)
+    embed.add_field(name="User", value=ctx.author.mention)
+    embed.add_field(
+        name="Question",
+        value="{}".format(
+            discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
+        ),
+    )
+    embed.add_field(name="Answer", value=result, inline=False)
 
     if result:
         await ctx.send(embed=embed)
