@@ -225,7 +225,7 @@ async def on_ready():
         )
     )
     # Start routine maintenance timer
-    await asyncio.create_task(every_minute())
+    bot.bgtask = bot.loop.create_task(every_minute())
 
 
 @bot.command(help="Shows bot information")
