@@ -26,6 +26,9 @@ import classes
 from datetime import datetime
 import asyncio
 import subnet_calc
+import smtplib, ssl
+import hashlib
+from email_validator import validate_email, EmailNotValidError
 
 conf = classes.Config()
 
@@ -39,6 +42,33 @@ bot = commands.Bot(
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
+
+
+async def send_email(to_email, message):
+    smtp_server = conf.get("smtp_server")
+    port = conf.get("smtp_port")
+    username = conf.get("smtp_username")
+    password = conf.get("smtp_password")
+    from_email = conf.get("smtp_fromemail")
+    context = ssl.create_default_context()
+    try:
+        server = smtplib.SMTP(smtp_server, port)
+        server.starttls(context=context)
+        server.login(username, password)
+        server.sendmail(from_email, to_email, message)
+    except Exception as e:
+        print(e)
+    finally:
+        server.quit()
+
+
+async def clear_member_roles(member, roletype: str):
+    for role in member.roles:
+        if role.name.startswith(roletype + ":"):
+            await member.remove_roles(role)
+            if len(role.members) == 0:
+                await role.delete(reason="Last member removed from dynamic role.")
+
 
 # Define predicates for bot commands checks
 async def is_guild_admin(ctx):
@@ -209,6 +239,115 @@ async def info(ctx):
         name="Github", value="https://github.com/networking-discord/network-ranger"
     )
     await ctx.send(embed=embed)
+
+
+@bot.group(help="Change user profile information")
+async def profile(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send(
+            "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
+        )
+
+
+@profile.group(help="Modify org information")
+async def org(ctx):
+    await ctx.message.delete()
+    if ctx.invoked_subcommand is None:
+        await ctx.send(
+            "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
+        )
+
+
+@org.command()
+async def set(ctx, email: str = None):
+    # Validate the email address.
+    if email == None:
+        await ctx.send(
+            "{mention}: You must specify the email address.".format(
+                mention=ctx.author.mention
+            )
+        )
+        return
+    try:
+        valid = validate_email(email)
+        email = valid.email
+        domain = valid.domain
+        # Calculate a hashed key based on the static salt in the config, the user's unique Discord ID, and the email.
+        hashedvalue = hashlib.sha1(
+            (conf.get("staticsalt") + str(ctx.author.id) + email).encode()
+        ).hexdigest()
+        msg = """\
+To: {email}
+Subject: Org Validation Key
+
+Your validation key is {key}. To activate your org affiliation, please send me the command:
+{command_prefix}profile org confirm {email} {key}
+
+Note that doing so will remove your present affiliation, if any.
+""".format(
+            email=email, key=hashedvalue, command_prefix=conf.get("command_prefix")
+        )
+        await send_email(email, msg)
+        await ctx.send(
+            "{mention}: I've emailed you to check your association with {domain}. Please check your email for the validation instructions.".format(
+                domain=domain, mention=ctx.author.mention
+            )
+        )
+    except EmailNotValidError as e:
+        await ctx.send(str(e))
+
+
+@org.command()
+async def clear(ctx):
+    await clear_member_roles(ctx.author, "org")
+    await ctx.send(
+        "{mention}: Your org (if any) has been cleared.".format(
+            mention=ctx.author.mention
+        )
+    )
+
+
+@org.command()
+async def confirm(ctx, email: str = None, key: str = None):
+    if key == None:
+        await ctx.send(
+            "{mention}: You must specify the email address and verification key.".format(
+                mention=ctx.author.mention
+            )
+        )
+        return
+    try:
+        valid = validate_email(email)
+        email = valid.email
+        domain = valid.domain
+        hashedvalue = hashlib.sha1(
+            (conf.get("staticsalt") + str(ctx.author.id) + email).encode()
+        ).hexdigest()
+        if key == hashedvalue:
+            await clear_member_roles(ctx.author, "org")
+
+            # Find the role
+            newrole = discord.utils.find(
+                lambda r: r.name == "org:{domain}".format(domain=domain),
+                ctx.guild.roles,
+            )
+
+            # If the role doesn't exist, create it
+            if newrole == None:
+                newrole = await ctx.guild.create_role(
+                    name="org:{domain}".format(domain=domain)
+                )
+            await ctx.author.add_roles(newrole)
+
+            await ctx.send(
+                "{mention}: Your org affiliation has been set to {domain}".format(
+                    domain=domain, mention=ctx.author.mention
+                )
+            )
+        else:
+            await ctx.send("{mention}: Invalid key.".format(mention=ctx.author.mention))
+    except EmailNotValidError as e:
+        await ctx.send(str(e))
 
 
 @bot.command(help="Display info on an IP subnet", aliases=["ipc", "ipcalc"])

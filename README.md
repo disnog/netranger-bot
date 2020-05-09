@@ -17,6 +17,13 @@ MEMBERROLE_NAME=Members
 TOKEN=<YourBotsPrivateToken>
 WELCOMECHANNEL_NAME=welcome
 MIRRORCHANNEL_NAME=egg-qc
+SMTP_USERNAME=mysmtpusername
+SMTP_PASSWORD=mysmtppassword
+SMTP_SERVER=in-v3.mailjet.com
+SMTP_PORT=587
+SMTP_FROMEMAIL=bot@domain.com
+STATICSALT=MakeThisSomethingRandom
+
 ```
 
 You can then run the bot via [`heroku local`](https://devcenter.heroku.com/articles/heroku-local) if you have the Heroku CLI installed.
