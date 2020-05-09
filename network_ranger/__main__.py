@@ -93,7 +93,7 @@ async def process_noncommands(message):
         embed.add_field(name="User", value=message.author.name)
         embed.add_field(name="Message", value=message.clean_content)
         await mirrorchannel.send(embed=embed)
-        if message.author != bot.user:
+        if not message.author.bot and not await is_guild_admin(message):
             await message.delete()
 
 
