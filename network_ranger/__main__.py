@@ -455,7 +455,7 @@ async def accept(ctx, answer: str = None):
             )
         )
         message = await ctx.send(response)
-        await message.add_reaction(u"\N{Face with Party Horn and Party Hat}")
+        await message.add_reaction("\U0001F973")
     else:
         await ctx.send(
             "*****{mention}, that is not the correct answer. Please try again once the timer allows.".format(
