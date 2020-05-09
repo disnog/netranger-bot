@@ -242,6 +242,7 @@ async def info(ctx):
 
 
 @bot.group(help="Change user profile information")
+@commands.check(is_accepted)
 async def profile(ctx):
     if ctx.invoked_subcommand is None:
         await ctx.send(
@@ -251,14 +252,18 @@ async def profile(ctx):
 
 @profile.group(help="Modify org information")
 async def org(ctx):
-    await ctx.message.delete()
+    # Delete the message if it hasn't already been deleted.
+    try:
+        await ctx.message.delete()
+    except discord.errors.NotFound:
+        pass
     if ctx.invoked_subcommand is None:
         await ctx.send(
             "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
         )
 
 
-@org.command()
+@org.command(help="Set an org affiliation role.")
 async def set(ctx, email: str = None):
     # Validate the email address.
     if email == None:
@@ -297,7 +302,7 @@ Note that doing so will remove your present affiliation, if any.
         await ctx.send(str(e))
 
 
-@org.command()
+@org.command(help="Clear your org affiliation role.")
 async def clear(ctx):
     await clear_member_roles(ctx.author, "org")
     await ctx.send(
@@ -307,7 +312,7 @@ async def clear(ctx):
     )
 
 
-@org.command()
+@org.command(help="Confirm an org affiliation role using the key from your email.")
 async def confirm(ctx, email: str = None, key: str = None):
     if key == None:
         await ctx.send(
