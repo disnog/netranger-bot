@@ -26,6 +26,8 @@ import classes
 from datetime import datetime
 import asyncio
 import subnet_calc
+import smtplib, ssl
+from email_validator import validate_email, EmailNotValidError
 
 conf = classes.Config()
 
@@ -39,6 +41,25 @@ bot = commands.Bot(
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
+
+
+def send_email(to_email, message):
+    smtp_server = conf.get("smtp_server")
+    port = conf.get("smtp_port")
+    username = conf.get("smtp_username")
+    password = conf.get("smtp_password")
+    from_email = conf.get("smtp_fromemail")
+    context = ssl.create_default_context()
+    try:
+        server = smtplib.SMTP(smtp_server, port)
+        server.starttls(context=context)
+        server.login(username, password)
+        server.sendmail(from_email, to_email, message)
+    except Exception as e:
+        print(e)
+    finally:
+        server.quit()
+
 
 # Define predicates for bot commands checks
 async def is_guild_admin(ctx):
@@ -209,6 +230,32 @@ async def info(ctx):
         name="Github", value="https://github.com/networking-discord/network-ranger"
     )
     await ctx.send(embed=embed)
+
+
+@bot.group()
+async def profile(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send("More arguments required.")
+
+
+@profile.command()
+async def setemployer(ctx, email: str):
+    # Validate this is a real email address.
+    try:
+        valid = validate_email(email)
+        email = valid.email
+        msg = """\
+To: {email}
+Subject: Test
+
+This is a test.
+This is only a test.
+""".format(
+            email=email
+        )
+        send_email(email, msg)
+    except EmailNotValidError as e:
+        await ctx.send(str(e))
 
 
 @bot.command(help="Display info on an IP subnet", aliases=["ipc", "ipcalc"])

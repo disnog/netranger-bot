@@ -94,6 +94,11 @@ What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
                 value="Network Ranger", environ="BOT_DESCRIPTION"
             ),
             "command_prefix": Config.VarDef(value="$", environ="COMMAND_PREFIX"),
+            "smtp_username": Config.VarDef(value=None, environ="SMTP_USERNAME"),
+            "smtp_password": Config.VarDef(value=None, environ="SMTP_PASSWORD"),
+            "smtp_server": Config.VarDef(value=None, environ="SMTP_SERVER"),
+            "smtp_port": Config.VarDef(value=None, environ="SMTP_PORT"),
+            "smtp_fromemail": Config.VarDef(value=None, environ="SMTP_FROMEMAIL"),
         }
 
         # TODO: Document environment variables
