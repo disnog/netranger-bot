@@ -123,7 +123,7 @@ async def prune_non_members():
                         " to have you if you're interested in network engineering. If you wish to rejoin, please feel"
                         " free to do so using the join link at {url}.".format(
                             server=conf.get("guild_name"),
-                            url="https://networking-discord.github.io",
+                            url="https://discord.neteng.xyz",
                         )
                     )
                 except discord.errors.Forbidden:
@@ -412,16 +412,16 @@ async def ip_collision_check(ctx, *args: str):
     help="Answer the challenge question in #{}".format(conf.get("welcomechannel_name"))
 )
 @commands.check(is_not_accepted)
-async def accept(ctx, *args: str):
-    if not len(args):
+async def accept(ctx, answer: str = None):
+    if answer == None:
         await ctx.send(
             "*****{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
                 mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
             )
         )
-    elif args[0] in ["28", "/28", "<28>", "</28>"]:
+    elif answer in ["28", "/28", "<28>", "</28>"]:
         await ctx.author.add_roles(
-            memberrole, reason="Accepted rules; Answer: " + args[0]
+            memberrole, reason="Accepted rules; Answer: " + answer
         )
         await memberchannel.send(
             "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to take a moment to introduce yourself!".format(
@@ -430,7 +430,7 @@ async def accept(ctx, *args: str):
                 membernumber=len(memberrole.members),
             )
         )
-    elif args[0] == "eggs":
+    elif answer == "eggs":
         await ctx.author.add_roles(
             eggsrole, reason="Really, terribly, desperately addicted to eggs."
         )
