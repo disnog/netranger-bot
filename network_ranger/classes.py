@@ -99,6 +99,7 @@ What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
             "smtp_server": Config.VarDef(value=None, environ="SMTP_SERVER"),
             "smtp_port": Config.VarDef(value=None, environ="SMTP_PORT"),
             "smtp_fromemail": Config.VarDef(value=None, environ="SMTP_FROMEMAIL"),
+            "staticsalt": Config.VarDef(value=None, environ="STATICSALT"),
         }
 
         # TODO: Document environment variables

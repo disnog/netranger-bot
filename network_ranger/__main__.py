@@ -27,6 +27,7 @@ from datetime import datetime
 import asyncio
 import subnet_calc
 import smtplib, ssl
+import hashlib
 from email_validator import validate_email, EmailNotValidError
 
 conf = classes.Config()
@@ -232,28 +233,100 @@ async def info(ctx):
     await ctx.send(embed=embed)
 
 
-@bot.group()
+@bot.group(help="Change user profile information")
 async def profile(ctx):
     if ctx.invoked_subcommand is None:
-        await ctx.send("More arguments required.")
+        await ctx.send(
+            "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
+        )
 
 
-@profile.command()
-async def setemployer(ctx, email: str):
-    # Validate this is a real email address.
+@profile.group(help="Modify org information")
+async def org(ctx):
+    await ctx.message.delete()
+    if ctx.invoked_subcommand is None:
+        await ctx.send(
+            "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
+        )
+
+
+@org.command()
+async def set(ctx, email: str):
+    # Validate the email address.
     try:
         valid = validate_email(email)
         email = valid.email
+        domain = valid.domain
+        # Calculate a hashed key based on the static salt in the config, the user's unique Discord ID, and the email.
+        hashedvalue = hashlib.sha1(
+            (conf.get("staticsalt") + str(ctx.author.id) + email).encode()
+        ).hexdigest()
         msg = """\
 To: {email}
-Subject: Test
+Subject: Org Validation Key
 
-This is a test.
-This is only a test.
+Your validation key is {key}. To activate your org association, please send me the command:
+{command_prefix}profile org confirm {email} {key}
 """.format(
-            email=email
+            email=email, key=hashedvalue, command_prefix=conf.get("command_prefix")
         )
         send_email(email, msg)
+        await ctx.send(
+            "{mention}: I've emailed you to check your association with {domain}. Please check your email for the validation instructions.".format(
+                domain=domain, mention=ctx.author.mention
+            )
+        )
+    except EmailNotValidError as e:
+        await ctx.send(str(e))
+
+
+@org.command()
+async def clear(ctx):
+    for role in ctx.author.roles:
+        if role.name.startswith("org:"):
+            await ctx.author.remove_roles(role)
+    await ctx.send(
+        "{mention}: Your org (if any) has been cleared.".format(
+            mention=ctx.author.mention
+        )
+    )
+
+
+@org.command()
+async def confirm(ctx, email: str, key: str):
+    try:
+        valid = validate_email(email)
+        email = valid.email
+        domain = valid.domain
+        hashedvalue = hashlib.sha1(
+            (conf.get("staticsalt") + str(ctx.author.id) + email).encode()
+        ).hexdigest()
+        if key == hashedvalue:
+            # Change the user's roles as appropriate
+            for role in ctx.author.roles:
+                if role.name.startswith("org:"):
+                    await ctx.author.remove_roles(role)
+
+            newrole = None
+            # Find the role
+            newrole = discord.utils.find(
+                lambda r: r.name == "org:{domain}".format(domain=domain),
+                ctx.guild.roles,
+            )
+            # If the role doesn't exist, create it
+            if newrole == None:
+                newrole = await ctx.guild.create_role(
+                    name="org:{domain}".format(domain=domain)
+                )
+            await ctx.author.add_roles(newrole)
+
+            await ctx.send(
+                "{mention}: Your org affiliation has been set to {domain}".format(
+                    domain=domain, mention=ctx.author.mention
+                )
+            )
+        else:
+            await ctx.send("{mention}: Invalid key.".format(mention=ctx.author.mention))
     except EmailNotValidError as e:
         await ctx.send(str(e))
 
