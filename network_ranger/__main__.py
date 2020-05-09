@@ -355,8 +355,17 @@ async def confirm(ctx, email: str = None, key: str = None):
         await ctx.send(str(e))
 
 
-@bot.command(help="Display info on an IP subnet", aliases=["ipc", "ipcalc"])
-async def ip_calc(ctx, *args: str):
+@bot.group(help="IP Subnet Calculator")
+@commands.check(is_accepted)
+async def ipcalc(ctx):
+    if ctx.invoked_subcommand is None:
+        await ctx.send(
+            "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
+        )
+
+
+@ipcalc.command(help="Display info on an IP subnet", aliases=["ipc", "subnetinfo"])
+async def info(ctx, *args: str):
     if not len(args):
         await ctx.send(
             "{mention}, this command requires an argument.".format(
@@ -383,8 +392,8 @@ async def ip_calc(ctx, *args: str):
         await ctx.send("`Something went wrong, contact a Mod.`")
 
 
-@bot.command(help="Check if two IP subnets overlap", aliases=["ipcc"])
-async def ip_collision_check(ctx, *args: str):
+@ipcalc.command(help="Check if two IP subnets overlap", aliases=["overlap", "cc"])
+async def collision(ctx, *args: str):
     if not len(args):
         await ctx.send(
             "{mention}, this command requires an argument.".format(
