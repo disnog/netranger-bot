@@ -454,7 +454,8 @@ async def accept(ctx, answer: str = None):
                 mention=ctx.author.mention, eggsmention=eggsrole.mention
             )
         )
-        await ctx.send(response)
+        message = await ctx.send(response)
+        await message.add_reaction("\N{Face with Party Horn and Party Hat}")
     else:
         await ctx.send(
             "*****{mention}, that is not the correct answer. Please try again once the timer allows.".format(
