@@ -44,7 +44,7 @@ bot = commands.Bot(
 )
 
 
-def send_email(to_email, message):
+async def send_email(to_email, message):
     smtp_server = conf.get("smtp_server")
     port = conf.get("smtp_port")
     username = conf.get("smtp_username")
@@ -60,6 +60,14 @@ def send_email(to_email, message):
         print(e)
     finally:
         server.quit()
+
+
+async def clear_member_roles(member, roletype: str):
+    for role in member.roles:
+        if role.name.startswith(roletype + ":"):
+            await member.remove_roles(role)
+            if len(role.members) == 0:
+                await role.delete(reason="Last member removed from dynamic role.")
 
 
 # Define predicates for bot commands checks
@@ -251,8 +259,15 @@ async def org(ctx):
 
 
 @org.command()
-async def set(ctx, email: str):
+async def set(ctx, email: str = None):
     # Validate the email address.
+    if email == None:
+        await ctx.send(
+            "{mention}: You must specify the email address.".format(
+                mention=ctx.author.mention
+            )
+        )
+        return
     try:
         valid = validate_email(email)
         email = valid.email
@@ -265,12 +280,14 @@ async def set(ctx, email: str):
 To: {email}
 Subject: Org Validation Key
 
-Your validation key is {key}. To activate your org association, please send me the command:
+Your validation key is {key}. To activate your org affiliation, please send me the command:
 {command_prefix}profile org confirm {email} {key}
+
+Note that doing so will remove your present affiliation, if any.
 """.format(
             email=email, key=hashedvalue, command_prefix=conf.get("command_prefix")
         )
-        send_email(email, msg)
+        await send_email(email, msg)
         await ctx.send(
             "{mention}: I've emailed you to check your association with {domain}. Please check your email for the validation instructions.".format(
                 domain=domain, mention=ctx.author.mention
@@ -282,9 +299,7 @@ Your validation key is {key}. To activate your org association, please send me t
 
 @org.command()
 async def clear(ctx):
-    for role in ctx.author.roles:
-        if role.name.startswith("org:"):
-            await ctx.author.remove_roles(role)
+    await clear_member_roles(ctx.author, "org")
     await ctx.send(
         "{mention}: Your org (if any) has been cleared.".format(
             mention=ctx.author.mention
@@ -293,7 +308,14 @@ async def clear(ctx):
 
 
 @org.command()
-async def confirm(ctx, email: str, key: str):
+async def confirm(ctx, email: str = None, key: str = None):
+    if key == None:
+        await ctx.send(
+            "{mention}: You must specify the email address and verification key.".format(
+                mention=ctx.author.mention
+            )
+        )
+        return
     try:
         valid = validate_email(email)
         email = valid.email
@@ -302,17 +324,14 @@ async def confirm(ctx, email: str, key: str):
             (conf.get("staticsalt") + str(ctx.author.id) + email).encode()
         ).hexdigest()
         if key == hashedvalue:
-            # Change the user's roles as appropriate
-            for role in ctx.author.roles:
-                if role.name.startswith("org:"):
-                    await ctx.author.remove_roles(role)
+            await clear_member_roles(ctx.author, "org")
 
-            newrole = None
             # Find the role
             newrole = discord.utils.find(
                 lambda r: r.name == "org:{domain}".format(domain=domain),
                 ctx.guild.roles,
             )
+
             # If the role doesn't exist, create it
             if newrole == None:
                 newrole = await ctx.guild.create_role(
