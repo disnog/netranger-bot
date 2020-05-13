@@ -35,10 +35,9 @@ conf = classes.Config()
 bot = commands.Bot(
     command_prefix=conf.get("command_prefix"),
     description=conf.get("bot_description"),
-    # TODO: De-hardcode activity
     activity=discord.Activity(
         type=discord.ActivityType.playing,
-        name="Network Ranger",
+        name="Network Ranger | {}help".format(conf.get("command_prefix")),
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
