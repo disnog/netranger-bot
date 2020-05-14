@@ -23,7 +23,7 @@ def subnet_calc_function():
                 "\nUse syntax: "
                 "\n-ipc 10.10.10.2/23"
                 "\nor"
-                "\n-ipc 10.10.10.2 255.255.254.0"
+                "\n-ipc info 10.10.10.2 255.255.254.0"
             )
             return error_message
 
@@ -47,7 +47,7 @@ def subnet_calc_function():
                 "\nUse syntax: "
                 "\n-ipc 10.10.10.2/23"
                 "\nor"
-                "\n-ipc 10.10.10.2 255.255.254.0"
+                "\n-ipc info 10.10.10.2 255.255.254.0"
             )
             return error_message
 
@@ -74,7 +74,7 @@ def subnet_collision_checker_function():
                 )
         else:
             error_message = (
-                "Invalid input" "\nuse syntax:" "\n-ipcc 10.10.10.5/29 10.10.10.16/28"
+                "Invalid input" "\nuse syntax:" "\n-ipc cc 10.10.10.5/29 10.10.10.16/28"
             )
             return error_message
 
