@@ -35,10 +35,9 @@ conf = classes.Config()
 bot = commands.Bot(
     command_prefix=conf.get("command_prefix"),
     description=conf.get("bot_description"),
-    # TODO: De-hardcode activity
     activity=discord.Activity(
         type=discord.ActivityType.playing,
-        name="Network Ranger",
+        name="Network Ranger | {}help".format(conf.get("command_prefix")),
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
@@ -438,10 +437,13 @@ async def accept(ctx, answer: str = None):
             memberrole, reason="Accepted rules; Answer: " + answer
         )
         await memberchannel.send(
-            "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to take a moment to introduce yourself!".format(
+            "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to "
+            "take a moment to introduce yourself! If you want to rep your company or school based on your email domain,"
+            " set an org role using: ```{command_prefix}profile org set <email@domain>```".format(
                 mention=ctx.author.mention,
                 server=memberchannel.guild.name,
                 membernumber=len(memberrole.members),
+                command_prefix=conf.get("command_prefix"),
             )
         )
     elif answer == "eggs":
