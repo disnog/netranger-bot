@@ -22,7 +22,7 @@ SMTP_PASSWORD=mysmtppassword
 SMTP_SERVER=in-v3.mailjet.com
 SMTP_PORT=587
 SMTP_FROMEMAIL=bot@domain.com
-STATICSALT=MakeThisSomethingRandom
+SECRETKEY=<Generate this with Fernet.generatekey()>
 
 ```
 
