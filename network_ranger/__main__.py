@@ -47,7 +47,7 @@ bot = commands.Bot(
     ),
 )
 
-#Todo: split out sending mail into a separate file
+
 async def send_email(to_email, message):
     smtp_server = conf.get("smtp_server")
     port = conf.get("smtp_port")
