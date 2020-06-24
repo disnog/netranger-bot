@@ -456,7 +456,7 @@ async def accept(ctx, answer: str = None):
                 mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
             )
         )
-    elif answer in ["28", "/28", "<28>", "</28>"]:
+    elif answer.lower() in ["tcp"]:
         await ctx.author.add_roles(
             memberrole, reason="Accepted rules; Answer: " + answer
         )
