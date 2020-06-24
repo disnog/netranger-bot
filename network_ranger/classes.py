@@ -111,7 +111,6 @@ Acme Inc has developed an application which has to send data which absolutely ca
                     self.config[var].value = os.environ[self.config[var].environ]
                 except KeyError as e:
                     print(
-                        "Warning: Environment variable {} is not defined. Defaulting to {}.".format(
-                            e.args[0], self.config[var].value
-                        )
+                        f"Warning: Environment variable {e.args[0]} is not defined. Defaulting to "
+                        f"{self.config[var].value}."
                     )

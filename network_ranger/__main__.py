@@ -523,7 +523,8 @@ async def on_message(message):
     # Process commands using the discord.py bot module
     await asyncio.create_task(bot.process_commands(message))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     token: str = conf.get("token")
     if token is None:
@@ -533,4 +534,3 @@ if __name__ == '__main__':
         bot.run(token)
     except discord.errors.LoginFailure as login_failure:
         sys.exit(str(login_failure))
-
