@@ -20,18 +20,17 @@
 Discord bot to maintain the Networking Discord Server.
 """
 
-import discord
-from discord.ext import commands
-import classes
-from datetime import datetime
 import asyncio
-import subnet_calc
 import json
-import base64
 import sys
-from cryptography.fernet import Fernet, InvalidToken
-import send_email
+from datetime import datetime
 
+import classes
+import discord
+import send_email
+import subnet_calc
+from cryptography.fernet import Fernet, InvalidToken
+from discord.ext import commands
 
 # import hashlib
 from email_validator import validate_email, EmailNotValidError
@@ -47,8 +46,6 @@ bot = commands.Bot(
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
-
-
 
 
 async def clear_member_roles(member, roletype: str):
