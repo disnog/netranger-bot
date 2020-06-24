@@ -39,6 +39,26 @@ If you're running this directly instead of as a container, you will need to load
 
 ### 3) Install and Run
 
+#### A) Kubernetes
+
+- 3.A.1. Copy the example:
+  ```zsh
+  cp kube-deploy.example.yaml kube-deploy.yaml
+  ```
+- 3.A.2. Modify `kube-deploy.yaml` to your liking. The default should work for most users.
+- 3.A.3. Create the deployment:
+  ```zsh
+  kubectl create -f kube-deploy.yaml
+  ```
+- 3.A.4. Create your secret from your .env file
+  ```zsh
+  kubectl create secret generic network-ranger -n network-ranger --from-env-file .env
+  ```
+- 3.A.5. Check that the pod is running
+  ```zsh
+  kubectl get pods -n network-ranger
+  ```
+
 #### B) Docker
 
 - 3.B.1. `cd` into your directory containing the `.env` file you created in Step 2
