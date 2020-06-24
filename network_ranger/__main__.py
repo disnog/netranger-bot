@@ -456,14 +456,14 @@ async def accept(ctx, answer: str = None):
                 mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
             )
         )
-    elif answer in ["28", "/28", "<28>", "</28>"]:
+    elif answer.lower() in ["tcp"]:
         await ctx.author.add_roles(
             memberrole, reason="Accepted rules; Answer: " + answer
         )
         await memberchannel.send(
             "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to "
             "take a moment to introduce yourself! If you want to rep your company or school based on your email domain,"
-            "get a key by DMing me the command ```{command_prefix}sendkey <email>``` then set an org role using: "
+            " get a key by DMing me the command ```{command_prefix}sendkey <email>``` then set an org role using: "
             "```{command_prefix}role org set <key>``` in any channel".format(
                 mention=ctx.author.mention,
                 server=memberchannel.guild.name,

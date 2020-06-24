@@ -63,7 +63,7 @@ __**To gain access to the rest of the server**__
 - Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
 - If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`.
 ```
-What is the prefix length of 123.45.67.89 with a netmask of 255.255.255.240?
+Acme Inc has developed an application which has to send data which absolutely cannot be lost by the receiver even when the data is sent over the Internet. Which common transport layer protocol should the application use? (Your answer should be the well-known initials for the protocol.)
 ```
 """
         self.config = {
