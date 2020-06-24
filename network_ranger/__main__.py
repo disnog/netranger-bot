@@ -463,7 +463,7 @@ async def accept(ctx, answer: str = None):
         await memberchannel.send(
             "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to "
             "take a moment to introduce yourself! If you want to rep your company or school based on your email domain,"
-            "get a key by DMing me the command ```{command_prefix}sendkey <email>``` then set an org role using: "
+            " get a key by DMing me the command ```{command_prefix}sendkey <email>``` then set an org role using: "
             "```{command_prefix}role org set <key>``` in any channel".format(
                 mention=ctx.author.mention,
                 server=memberchannel.guild.name,
