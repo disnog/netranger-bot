@@ -26,11 +26,11 @@ import classes
 from datetime import datetime
 import asyncio
 import subnet_calc
-import smtplib, ssl
 import json
 import base64
 import sys
 from cryptography.fernet import Fernet, InvalidToken
+import send_email
 
 
 # import hashlib
@@ -49,22 +49,6 @@ bot = commands.Bot(
 )
 
 
-async def send_email(to_email, message):
-    smtp_server = conf.get("smtp_server")
-    port = conf.get("smtp_port")
-    username = conf.get("smtp_username")
-    password = conf.get("smtp_password")
-    from_email = conf.get("smtp_fromemail")
-    context = ssl.create_default_context()
-    try:
-        server = smtplib.SMTP(smtp_server, port)
-        server.starttls(context=context)
-        server.login(username, password)
-        server.sendmail(from_email, to_email, message)
-    except Exception as e:
-        print(e)
-    finally:
-        server.quit()
 
 
 async def clear_member_roles(member, roletype: str):
@@ -268,11 +252,9 @@ async def sendkey(ctx, email: str):
         email = valid.email
         domain = valid.domain
         secretkey = conf.get("secretkey").encode()
-
         # Calculate an encrypted JSON string with userid and email
         emailkey = json.dumps({"uid": str(ctx.author.id), "email": email})
         emailkey = Fernet(secretkey).encrypt(emailkey.encode())
-
         msg = """\
 To: {email}
 Subject: Networking Discord Email Validation Key
@@ -286,9 +268,10 @@ Note that doing so will remove your present org affiliation role, if any.
             key=emailkey.decode(),
             command_prefix=conf.get("command_prefix"),
         )
-        await send_email(email, msg)
+        await send_email.send_email(email, msg)
         await ctx.send(
-            "{mention}: I've emailed you to check your association with {domain}. Please check your email for the validation instructions.".format(
+            "{mention}: I've emailed you to check your association with {domain}. It may take a while to receive it"
+            ". Please check your email for the validation instructions.".format(
                 domain=domain, mention=ctx.author.mention
             )
         )
