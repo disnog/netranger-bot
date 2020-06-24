@@ -29,6 +29,7 @@ import subnet_calc
 import smtplib, ssl
 import json
 import base64
+import sys
 from cryptography.fernet import Fernet, InvalidToken
 
 
@@ -522,5 +523,14 @@ async def on_message(message):
     # Process commands using the discord.py bot module
     await asyncio.create_task(bot.process_commands(message))
 
+if __name__ == '__main__':
 
-bot.run(conf.get("token"))
+    token: str = conf.get("token")
+    if token is None:
+        print("Fatal: Discord bot token not set. Exiting")
+        sys.exit(1)
+    try:
+        bot.run(token)
+    except discord.errors.LoginFailure as login_failure:
+        sys.exit(str(login_failure))
+
