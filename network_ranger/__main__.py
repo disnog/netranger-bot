@@ -20,17 +20,17 @@
 Discord bot to maintain the Networking Discord Server.
 """
 
-import discord
-from discord.ext import commands
-import classes
-from datetime import datetime
 import asyncio
-import subnet_calc
-import smtplib, ssl
 import json
-import base64
-from cryptography.fernet import Fernet, InvalidToken
+import sys
+from datetime import datetime
 
+import classes
+import discord
+import send_email
+import subnet_calc
+from cryptography.fernet import Fernet, InvalidToken
+from discord.ext import commands
 
 # import hashlib
 from email_validator import validate_email, EmailNotValidError
@@ -46,24 +46,6 @@ bot = commands.Bot(
         url="https://github.com/Networking-discord/network-ranger",
     ),
 )
-
-
-async def send_email(to_email, message):
-    smtp_server = conf.get("smtp_server")
-    port = conf.get("smtp_port")
-    username = conf.get("smtp_username")
-    password = conf.get("smtp_password")
-    from_email = conf.get("smtp_fromemail")
-    context = ssl.create_default_context()
-    try:
-        server = smtplib.SMTP(smtp_server, port)
-        server.starttls(context=context)
-        server.login(username, password)
-        server.sendmail(from_email, to_email, message)
-    except Exception as e:
-        print(e)
-    finally:
-        server.quit()
 
 
 async def clear_member_roles(member, roletype: str):
@@ -267,11 +249,9 @@ async def sendkey(ctx, email: str):
         email = valid.email
         domain = valid.domain
         secretkey = conf.get("secretkey").encode()
-
         # Calculate an encrypted JSON string with userid and email
         emailkey = json.dumps({"uid": str(ctx.author.id), "email": email})
         emailkey = Fernet(secretkey).encrypt(emailkey.encode())
-
         msg = """\
 To: {email}
 Subject: Networking Discord Email Validation Key
@@ -285,9 +265,10 @@ Note that doing so will remove your present org affiliation role, if any.
             key=emailkey.decode(),
             command_prefix=conf.get("command_prefix"),
         )
-        await send_email(email, msg)
+        await send_email.send_email(email, msg)
         await ctx.send(
-            "{mention}: I've emailed you to check your association with {domain}. Please check your email for the validation instructions.".format(
+            "{mention}: I've emailed you to check your association with {domain}. It may take a while to receive it"
+            ". Please check your email for the validation instructions.".format(
                 domain=domain, mention=ctx.author.mention
             )
         )
@@ -523,4 +504,13 @@ async def on_message(message):
     await asyncio.create_task(bot.process_commands(message))
 
 
-bot.run(conf.get("token"))
+if __name__ == "__main__":
+
+    token: str = conf.get("token")
+    if token is None:
+        print("Fatal: Discord bot token not set. Exiting")
+        sys.exit(1)
+    try:
+        bot.run(token)
+    except discord.errors.LoginFailure as login_failure:
+        sys.exit(str(login_failure))
