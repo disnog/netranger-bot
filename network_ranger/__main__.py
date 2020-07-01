@@ -23,6 +23,7 @@ Discord bot to maintain the Networking Discord Server.
 import asyncio
 import json
 import sys
+import os
 from datetime import datetime
 
 import classes
@@ -220,6 +221,7 @@ async def info(ctx):
     embed = discord.Embed(
         title="Network Ranger", description=conf.get("bot_description")
     )
+    embed.add_field(name="Host", value=os.uname()[1])
     embed.add_field(name="Command Prefix", value=conf.get("command_prefix"))
     embed.add_field(
         name="Github", value="https://github.com/networking-discord/network-ranger"
