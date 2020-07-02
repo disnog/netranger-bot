@@ -51,6 +51,7 @@ __**This is not a place intended for:**__
 :no_entry: home networking
 :no_entry: [non-network] programming
 :no_entry: non-networking IT disciplines
+If you're here for any of the above, check out https://discord.neteng.xyz/other-resources.
 
 __**General rules:**__
 - No cheating, whatsoever.  Asking for or distributing braindumps will result in an immediate ban.
