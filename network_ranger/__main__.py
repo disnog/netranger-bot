@@ -269,8 +269,8 @@ Note that doing so will remove your present org affiliation role, if any.
         )
         await send_email.send_email(email, msg)
         await ctx.send(
-            "{mention}: I've emailed you to check your association with {domain}. It may take a while to receive it"
-            ". Please check your email for the validation instructions.".format(
+            "{mention}: I've emailed you to check your association with {domain}. "
+            "Please check your email for the validation instructions.".format(
                 domain=domain, mention=ctx.author.mention
             )
         )
