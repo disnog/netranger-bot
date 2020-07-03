@@ -256,6 +256,7 @@ async def myinfo(ctx):
 
 
 @bot.command(help="Send an email key")
+@commands.check(is_accepted)
 async def sendkey(ctx, email: str):
     # Delete the message if it hasn't already been deleted.
     try:
@@ -470,6 +471,7 @@ async def accept(ctx, answer: str = None):
             memberrole, reason="Accepted rules; Answer: " + answer
         )
         db.add_permanent_role(ctx.author.id, "Member")
+        db.add_member_numbers()
         await memberchannel.send(
             "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to "
             "take a moment to introduce yourself! If you want to rep your company or school based on your email domain,"
@@ -510,6 +512,7 @@ async def on_member_join(member):
     :return:
     """
     db.add_member(member)
+    db.add_first_joined_ats(bot.guilds[0])
     await welcomechannel.send(
         conf.get("welcomemessage").format(
             server=member.guild.name,
