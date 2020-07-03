@@ -33,10 +33,22 @@ import subnet_calc
 from cryptography.fernet import Fernet, InvalidToken
 from discord.ext import commands
 
-# import hashlib
 from email_validator import validate_email, EmailNotValidError
+from db import Db
 
 conf = classes.Config()
+
+if conf.get("db_name") and conf.get("db_user"):
+    db = Db(
+        host=conf.get("db_host"),
+        port=int(conf.get("db_port")),
+        mongo_user=conf.get("db_user"),
+        mongo_pass=conf.get("db_pass"),
+        dbname=conf.get("db_name"),
+    )
+else:
+    db = False
+    print("DB configuration not present; not attempting to connect to DB.")
 
 bot = commands.Bot(
     command_prefix=conf.get("command_prefix"),
@@ -143,6 +155,9 @@ async def on_ready():
             username=bot.user.name, userid=bot.user.id
         )
     )
+    if db:
+        db.add_new_members(bot.guilds[0])
+
     # TODO: De-hardcode
     global welcomechannel
     welcomechannel = discord.utils.get(
