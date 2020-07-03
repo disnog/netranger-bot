@@ -156,7 +156,7 @@ async def on_ready():
         )
     )
     if db:
-        db.add_new_members(bot.guilds[0])
+        db.add_existing_members(bot.guilds[0])
 
     # TODO: De-hardcode
     global welcomechannel
@@ -232,7 +232,7 @@ async def on_ready():
 
 @bot.command(help="Shows bot information")
 @commands.check(is_guild_mod)
-async def info(ctx):
+async def botinfo(ctx):
     embed = discord.Embed(
         title="Network Ranger", description=conf.get("bot_description")
     )
@@ -241,6 +241,17 @@ async def info(ctx):
     embed.add_field(
         name="Github", value="https://github.com/networking-discord/network-ranger"
     )
+    await ctx.send(embed=embed)
+
+
+@bot.command(help="Shows your member profile")
+@commands.check(is_accepted)
+async def myinfo(ctx):
+    embed = discord.Embed(
+        title=ctx.author.display_name,
+        description=f"{ctx.author.name}#{ctx.author.discriminator}",
+    )
+    embed.add_field(name="Member Number", value=db.get_member_number(ctx.author.id))
     await ctx.send(embed=embed)
 
 
@@ -458,6 +469,7 @@ async def accept(ctx, answer: str = None):
         await ctx.author.add_roles(
             memberrole, reason="Accepted rules; Answer: " + answer
         )
+        db.add_permanent_role(ctx.author.id, "Member")
         await memberchannel.send(
             "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to "
             "take a moment to introduce yourself! If you want to rep your company or school based on your email domain,"
@@ -465,7 +477,7 @@ async def accept(ctx, answer: str = None):
             "```{command_prefix}role org set <key>``` in any channel".format(
                 mention=ctx.author.mention,
                 server=memberchannel.guild.name,
-                membernumber=len(memberrole.members),
+                membernumber=db.get_member_number(ctx.author.id),
                 command_prefix=conf.get("command_prefix"),
             )
         )
@@ -473,6 +485,7 @@ async def accept(ctx, answer: str = None):
         await ctx.author.add_roles(
             eggsrole, reason="Really, terribly, desperately addicted to eggs."
         )
+        db.add_permanent_role(ctx.author.id, "!eggs")
         response = (
             "*****{mention}, congratulations! You've joined {eggsmention}! For more information about eggs, please "
             "visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
@@ -496,6 +509,7 @@ async def on_member_join(member):
     :param member:
     :return:
     """
+    db.add_member(member)
     await welcomechannel.send(
         conf.get("welcomemessage").format(
             server=member.guild.name,
