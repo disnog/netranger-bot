@@ -252,6 +252,8 @@ async def myinfo(ctx):
         description=f"{ctx.author.name}#{ctx.author.discriminator}",
     )
     embed.add_field(name="Member Number", value=db.get_member_number(ctx.author.id))
+    permanent_roles = "\r\n".join(db.get_permanent_roles(ctx.author.id))
+    embed.add_field(name="Permanent Roles", value=permanent_roles)
     await ctx.send(embed=embed)
 
 
