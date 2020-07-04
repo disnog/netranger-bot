@@ -104,9 +104,10 @@ class Db:
             "name": member.name,
             "nick": member.nick,
             "discriminator": member.discriminator,
-            "permanent_roles": [],
         }
-        self.users.insert_one(m)
+        op_list = []
+        op_list.append(UpdateOne({"_id": m["_id"]}, {"$set": m}, upsert=True))
+        self.users.bulk_write(op_list)
 
     def add_permanent_role(self, member_id, role_name):
         self.users.update_one(
