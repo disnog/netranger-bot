@@ -114,8 +114,11 @@ class Db:
             {"_id": member_id}, {"$push": {"permanent_roles": role_name}}
         )
 
+    def get_member(self, member_id):
+        return self.users.find_one({"_id": member_id})
+
     def get_member_number(self, member_id):
-        return self.users.find_one({"_id": member_id})["member_number"]
+        return self.get_member(member_id)["member_number"]
 
     def get_permanent_roles(self, member_id):
         permanent_roles = list()

@@ -251,7 +251,14 @@ async def myinfo(ctx):
         title=ctx.author.display_name,
         description=f"{ctx.author.name}#{ctx.author.discriminator}",
     )
-    embed.add_field(name="Member Number", value=db.get_member_number(ctx.author.id))
+    member_info = db.get_member(ctx.author.id)
+    embed.add_field(name="Member Number", value=member_info["member_number"])
+    embed.add_field(
+        name="First Joined At",
+        value=datetime.utcfromtimestamp(member_info["first_joined_at"]).strftime(
+            "%Y-%b-%d %H:%M:%S UTC"
+        ),
+    )
     permanent_roles = "\r\n".join(db.get_permanent_roles(ctx.author.id))
     embed.add_field(name="Permanent Roles", value=permanent_roles)
     await ctx.send(embed=embed)
