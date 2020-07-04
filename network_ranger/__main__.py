@@ -514,14 +514,31 @@ async def on_member_join(member):
     :return:
     """
     db.add_member(member)
-    db.add_first_joined_ats(bot.guilds[0])
-    await welcomechannel.send(
-        conf.get("welcomemessage").format(
-            server=member.guild.name,
-            mention=member.mention,
-            command_prefix=conf.get("command_prefix"),
+    permanent_roles = db.get_permanent_roles(member.id)
+    if "!eggs" in permanent_roles:
+        # Reapply !eggs role if they had it before
+        await member.add_roles(eggsrole, reason="Eggs have returned.")
+    if "Member" in permanent_roles:
+        # Bypass welcome channel
+        await member.add_roles(memberrole)
+        await memberchannel.send(
+            "{mention}, welcome back to {server}! We've held on to your previous member number,"
+            " #{membernumber}.".format(
+                mention=member.mention,
+                server=memberchannel.guild.name,
+                membernumber=db.get_member_number(member.id),
+            )
         )
-    )
+    else:
+        # Send to welcome channel
+        db.add_first_joined_ats(bot.guilds[0])
+        await welcomechannel.send(
+            conf.get("welcomemessage").format(
+                server=member.guild.name,
+                mention=member.mention,
+                command_prefix=conf.get("command_prefix"),
+            )
+        )
 
 
 @bot.event

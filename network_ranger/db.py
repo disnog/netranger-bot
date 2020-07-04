@@ -123,6 +123,6 @@ class Db:
             permanent_roles.extend(
                 self.users.find_one({"_id": member_id})["permanent_roles"]
             )
-        except TypeError:
+        except KeyError:
             pass
         return permanent_roles
