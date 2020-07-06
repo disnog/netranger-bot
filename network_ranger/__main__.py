@@ -33,10 +33,22 @@ import subnet_calc
 from cryptography.fernet import Fernet, InvalidToken
 from discord.ext import commands
 
-# import hashlib
 from email_validator import validate_email, EmailNotValidError
+from db import Db
 
 conf = classes.Config()
+
+if conf.get("db_name") and conf.get("db_user"):
+    db = Db(
+        host=conf.get("db_host"),
+        port=int(conf.get("db_port")),
+        mongo_user=conf.get("db_user"),
+        mongo_pass=conf.get("db_pass"),
+        dbname=conf.get("db_name"),
+    )
+else:
+    db = False
+    print("DB configuration not present; not attempting to connect to DB.")
 
 bot = commands.Bot(
     command_prefix=conf.get("command_prefix"),
@@ -143,6 +155,9 @@ async def on_ready():
             username=bot.user.name, userid=bot.user.id
         )
     )
+    if db:
+        db.add_existing_members(bot.guilds[0])
+
     # TODO: De-hardcode
     global welcomechannel
     welcomechannel = discord.utils.get(
@@ -217,7 +232,7 @@ async def on_ready():
 
 @bot.command(help="Shows bot information")
 @commands.check(is_guild_mod)
-async def info(ctx):
+async def botinfo(ctx):
     embed = discord.Embed(
         title="Network Ranger", description=conf.get("bot_description")
     )
@@ -229,7 +244,28 @@ async def info(ctx):
     await ctx.send(embed=embed)
 
 
+@bot.command(help="Shows your member profile")
+@commands.check(is_accepted)
+async def myinfo(ctx):
+    embed = discord.Embed(
+        title=ctx.author.display_name,
+        description=f"{ctx.author.name}#{ctx.author.discriminator}",
+    )
+    member_info = db.get_member(ctx.author.id)
+    embed.add_field(name="Member Number", value=member_info["member_number"])
+    embed.add_field(
+        name="First Joined At",
+        value=datetime.utcfromtimestamp(member_info["first_joined_at"]).strftime(
+            "%Y-%b-%d %H:%M:%S UTC"
+        ),
+    )
+    permanent_roles = "\r\n".join(db.get_permanent_roles(ctx.author.id))
+    embed.add_field(name="Permanent Roles", value=permanent_roles)
+    await ctx.send(embed=embed)
+
+
 @bot.command(help="Send an email key")
+@commands.check(is_accepted)
 async def sendkey(ctx, email: str):
     # Delete the message if it hasn't already been deleted.
     try:
@@ -443,6 +479,8 @@ async def accept(ctx, answer: str = None):
         await ctx.author.add_roles(
             memberrole, reason="Accepted rules; Answer: " + answer
         )
+        db.add_permanent_role(ctx.author.id, "Member")
+        db.add_member_numbers()
         await memberchannel.send(
             "{mention}, welcome to {server}! You are member #{membernumber}, and we're glad to have you. Feel free to "
             "take a moment to introduce yourself! If you want to rep your company or school based on your email domain,"
@@ -450,7 +488,7 @@ async def accept(ctx, answer: str = None):
             "```{command_prefix}role org set <key>``` in any channel".format(
                 mention=ctx.author.mention,
                 server=memberchannel.guild.name,
-                membernumber=len(memberrole.members),
+                membernumber=db.get_member_number(ctx.author.id),
                 command_prefix=conf.get("command_prefix"),
             )
         )
@@ -458,6 +496,7 @@ async def accept(ctx, answer: str = None):
         await ctx.author.add_roles(
             eggsrole, reason="Really, terribly, desperately addicted to eggs."
         )
+        db.add_permanent_role(ctx.author.id, "!eggs")
         response = (
             "*****{mention}, congratulations! You've joined {eggsmention}! For more information about eggs, please "
             "visit https://lmgtfy.com/?q=eggs or consult your local farmer.".format(
@@ -481,13 +520,32 @@ async def on_member_join(member):
     :param member:
     :return:
     """
-    await welcomechannel.send(
-        conf.get("welcomemessage").format(
-            server=member.guild.name,
-            mention=member.mention,
-            command_prefix=conf.get("command_prefix"),
+    db.add_member(member)
+    permanent_roles = db.get_permanent_roles(member.id)
+    if "!eggs" in permanent_roles:
+        # Reapply !eggs role if they had it before
+        await member.add_roles(eggsrole, reason="Eggs have returned.")
+    if "Member" in permanent_roles:
+        # Bypass welcome channel
+        await member.add_roles(memberrole)
+        await memberchannel.send(
+            "{mention}, welcome back to {server}! We've held on to your previous member number,"
+            " #{membernumber}.".format(
+                mention=member.mention,
+                server=memberchannel.guild.name,
+                membernumber=db.get_member_number(member.id),
+            )
         )
-    )
+    else:
+        # Send to welcome channel
+        db.add_first_joined_ats(bot.guilds[0])
+        await welcomechannel.send(
+            conf.get("welcomemessage").format(
+                server=member.guild.name,
+                mention=member.mention,
+                command_prefix=conf.get("command_prefix"),
+            )
+        )
 
 
 @bot.event

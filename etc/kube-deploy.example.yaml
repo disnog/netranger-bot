@@ -106,3 +106,16 @@ spec:
                 secretKeyRef:
                   name: network-ranger
                   key: SECRETKEY
+            - name: DB_HOST
+              value: "mongodb"
+            - name: DB_PORT
+              value: "27017"
+            - name: DB_USER
+              value: "root"
+            - name: DB_NAME
+              value: "network_ranger"
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: mongodb-root-password
