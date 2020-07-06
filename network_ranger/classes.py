@@ -51,6 +51,7 @@ __**This is not a place intended for:**__
 :no_entry: home networking
 :no_entry: [non-network] programming
 :no_entry: non-networking IT disciplines
+If you're here for any of the above, check out https://discord.neteng.xyz/other-resources.
 
 __**General rules:**__
 - No cheating, whatsoever.  Asking for or distributing braindumps will result in an immediate ban.
@@ -100,6 +101,11 @@ Acme Inc has developed an application which has to send data which absolutely ca
             "smtp_port": Config.VarDef(value=None, environ="SMTP_PORT"),
             "smtp_fromemail": Config.VarDef(value=None, environ="SMTP_FROMEMAIL"),
             "secretkey": Config.VarDef(value=None, environ="SECRETKEY"),
+            "db_host": Config.VarDef(value=None, environ="DB_HOST"),
+            "db_port": Config.VarDef(value=27017, environ="DB_PORT"),
+            "db_user": Config.VarDef(value=None, environ="DB_USER"),
+            "db_pass": Config.VarDef(value=None, environ="DB_PASS"),
+            "db_name": Config.VarDef(value=None, environ="DB_NAME"),
         }
 
         # TODO: Document environment variables
@@ -111,7 +117,6 @@ Acme Inc has developed an application which has to send data which absolutely ca
                     self.config[var].value = os.environ[self.config[var].environ]
                 except KeyError as e:
                     print(
-                        "Warning: Environment variable {} is not defined. Defaulting to {}.".format(
-                            e.args[0], self.config[var].value
-                        )
+                        f"Warning: Environment variable {e.args[0]} is not defined. Defaulting to "
+                        f"{self.config[var].value}."
                     )
