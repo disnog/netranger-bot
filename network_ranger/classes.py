@@ -101,6 +101,11 @@ Acme Inc has developed an application which has to send data which absolutely ca
             "smtp_port": Config.VarDef(value=None, environ="SMTP_PORT"),
             "smtp_fromemail": Config.VarDef(value=None, environ="SMTP_FROMEMAIL"),
             "secretkey": Config.VarDef(value=None, environ="SECRETKEY"),
+            "db_host": Config.VarDef(value=None, environ="DB_HOST"),
+            "db_port": Config.VarDef(value=27017, environ="DB_PORT"),
+            "db_user": Config.VarDef(value=None, environ="DB_USER"),
+            "db_pass": Config.VarDef(value=None, environ="DB_PASS"),
+            "db_name": Config.VarDef(value=None, environ="DB_NAME"),
         }
 
         # TODO: Document environment variables

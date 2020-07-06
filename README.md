@@ -33,6 +33,11 @@ SMTP_SERVER=in-v3.mailjet.com
 SMTP_PORT=587
 SMTP_FROMEMAIL=bot@domain.com
 SECRETKEY=Secret key from Step 1
+DB_HOST=mongodb.hostname
+DB_PORT=27017
+DB_NAME=network_ranger
+DB_USER=<dbuser>
+DB_PASS=<dbpass>
 ```
 If you're running this directly instead of as a container, you will need to load each one of these as an environment
  variable.
