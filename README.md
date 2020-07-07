@@ -37,15 +37,23 @@ DB_HOST=mongodb.hostname
 DB_PORT=27017
 DB_NAME=network_ranger
 DB_USER=<dbuser>
-DB_PASS=<dbpass>
+#DB_PASS=<dbpass>
 ```
 If you're running this directly instead of as a container, you will need to load each one of these as an environment
- variable.
+ variable. Also, DB_PASS is commented as it should be loaded from your MongoDB secret if installed with Kubernetes. If
+ not running with Kubernetes, you'll need to populate this.
 
 ### 3) Install and Run
 
 #### A) Kubernetes
 
+- 3.A.0. Prerequisites:
+  - MongoDB installed and running in the namespace you'll use for network-ranger. We recommend use of the helm chart to
+   achieve this:
+    ```
+    helm repo add bitmami https://hub.helm.sh/charts/bitnami
+    helm install -n network-ranger mongodb bitnami/mongodb
+    ```
 - 3.A.1. Copy the example:
   ```zsh
   cp kube-deploy.example.yaml kube-deploy.yaml
