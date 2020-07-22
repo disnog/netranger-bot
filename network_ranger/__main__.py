@@ -35,6 +35,7 @@ from discord.ext import commands
 
 from email_validator import validate_email, EmailNotValidError
 from db import Db
+from cogs.background_timer import BackgroundTimer
 
 conf = classes.Config()
 
@@ -60,6 +61,7 @@ bot = commands.Bot(
     ),
 )
 
+bot.add_cog(BackgroundTimer(bot))
 
 async def clear_member_roles(member, roletype: str):
     for role in member.roles:
@@ -94,58 +96,6 @@ async def process_noncommands(message):
         await mirrorchannel.send(embed=embed)
         if not message.author.bot and not await is_guild_admin(message):
             await message.delete()
-
-
-async def prune_non_members():
-    # Build a list of members to kick if they've been sitting in the welcome channel more than 3 days.
-    warning_seconds = 172800
-    kick_seconds = 259200
-    for member in welcomechannel.members:
-        if memberrole not in member.roles and not member.bot:
-            time_on_server = datetime.utcnow() - member.joined_at
-            if 0 <= time_on_server.total_seconds() - warning_seconds < 60:
-                # Warn them that they're going to be kicked if they continue to idle.
-                await welcomechannel.send(
-                    "{mention}, you've been idling in {welcome_channel} for {time}. If you do not "
-                    "`{command_prefix}accept`, you will be removed and will need to rejoin.".format(
-                        mention=member.mention,
-                        welcome_channel=welcomechannel.name,
-                        time=time_on_server,
-                        command_prefix=conf.get("command_prefix"),
-                    )
-                )
-            if time_on_server.total_seconds() > kick_seconds:
-                # Kick the user for not accepting.
-                try:
-                    await member.send(
-                        "You are being removed from {server} because you have not accepted the rules. We'd still love"
-                        " to have you if you're interested in network engineering. If you wish to rejoin, please feel"
-                        " free to do so using the join link at {url}.".format(
-                            server=conf.get("guild_name"),
-                            url="https://discord.neteng.xyz",
-                        )
-                    )
-                except discord.errors.Forbidden:
-                    pass
-                except discord.errors.HTTPException:
-                    pass
-                try:
-                    await welcomechannel.guild.kick(
-                        member,
-                        reason="Did not accept the rules in {time}".format(
-                            time=time_on_server
-                        ),
-                    )
-                except discord.errors.Forbidden:
-                    pass
-                except discord.errors.HTTPException:
-                    pass
-
-
-async def every_minute():
-    while True:
-        await asyncio.create_task(prune_non_members())
-        await asyncio.sleep(60)
 
 
 @bot.event
@@ -226,8 +176,6 @@ async def on_ready():
             command_prefix=conf.get("command_prefix")
         )
     )
-    # Start routine maintenance timer
-    bot.bgtask = bot.loop.create_task(every_minute())
 
 
 @bot.command(help="Shows bot information")
