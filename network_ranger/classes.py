@@ -62,7 +62,7 @@ __**General rules:**__
 
 __**To gain access to the rest of the server**__
 - Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
-- If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`.
+- If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`. Do not use any special characters other than the specified command prefix: {command_prefix}.
 ```
 Acme Inc has developed an application which has to send data which absolutely cannot be lost by the receiver even when the data is sent over the Internet. Which common transport layer protocol should the application use? (Your answer should be the well-known initials for the protocol.)
 ```
