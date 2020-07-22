@@ -22,20 +22,21 @@ Discord bot to maintain the Networking Discord Server.
 
 import asyncio
 import json
-import sys
 import os
+import sys
 from datetime import datetime
 
 import classes
 import discord
 import send_email
 import subnet_calc
-from cryptography.fernet import Fernet, InvalidToken
-from discord.ext import commands
-
-from email_validator import validate_email, EmailNotValidError
-from db import Db
 from cogs.background_timer import BackgroundTimer
+from cryptography.fernet import Fernet, InvalidToken
+from db import Db
+from discord.ext import commands
+from email_validator import validate_email, EmailNotValidError
+import re
+import random
 
 conf = classes.Config()
 
@@ -417,6 +418,9 @@ async def collision(ctx, *args: str):
 )
 @commands.check(is_not_accepted)
 async def accept(ctx, answer: str = None):
+    if answer != None:
+        # Strip special characters from the answer
+        answer = re.sub(r'\W','',answer)
     if answer == None:
         await ctx.send(
             "*****{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
