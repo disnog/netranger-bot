@@ -63,6 +63,7 @@ bot = commands.Bot(
     ),
 )
 
+
 async def clear_member_roles(member, roletype: str):
     for role in member.roles:
         if role.name.startswith(roletype + ":"):
@@ -191,6 +192,7 @@ async def botinfo(ctx):
     )
     await ctx.send(embed=embed)
 
+
 class UserProfiles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -213,7 +215,6 @@ class UserProfiles(commands.Cog):
         permanent_roles = "\r\n".join(db.get_permanent_roles(ctx.author.id))
         embed.add_field(name="Permanent Roles", value=permanent_roles)
         await ctx.send(embed=embed)
-
 
     @commands.command(help="Send an email key")
     @commands.check(is_accepted)
@@ -264,7 +265,6 @@ class UserProfiles(commands.Cog):
         except EmailNotValidError as e:
             await ctx.send(str(e))
 
-
     @commands.group(help="Set or clear roles for yourself")
     @commands.check(is_accepted)
     async def role(self, ctx):
@@ -272,7 +272,6 @@ class UserProfiles(commands.Cog):
             await ctx.send(
                 "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
             )
-
 
     @role.group(help="Modify org information")
     async def org(self, ctx):
@@ -286,7 +285,6 @@ class UserProfiles(commands.Cog):
                 "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
             )
 
-
     @org.command(help="Clear your org affiliation role.")
     async def clear(self, ctx):
         await clear_member_roles(ctx.author, "org")
@@ -295,7 +293,6 @@ class UserProfiles(commands.Cog):
                 mention=ctx.author.mention
             )
         )
-
 
     @org.command(help="Set an org affiliation role using your email verification key.")
     async def set(self, ctx, key: str = None):
@@ -319,7 +316,9 @@ class UserProfiles(commands.Cog):
                 or "email" not in emailkey
                 or emailkey["uid"] != str(ctx.author.id)
             ):
-                await ctx.send("{mention}: Invalid key".format(mention=ctx.author.mention))
+                await ctx.send(
+                    "{mention}: Invalid key".format(mention=ctx.author.mention)
+                )
                 raise Exception("Invalid emailkey", emailkey)
             valid = validate_email(emailkey["email"])
             domain = valid.domain
@@ -327,7 +326,8 @@ class UserProfiles(commands.Cog):
 
             # Find the role
             newrole = discord.utils.find(
-                lambda r: r.name == "org:{domain}".format(domain=domain), ctx.guild.roles
+                lambda r: r.name == "org:{domain}".format(domain=domain),
+                ctx.guild.roles,
             )
 
             # If the role doesn't exist, create it
@@ -347,6 +347,7 @@ class UserProfiles(commands.Cog):
         except EmailNotValidError as e:
             await ctx.send(str(e))
 
+
 class IPCalc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -359,25 +360,29 @@ class IPCalc(commands.Cog):
                 "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
             )
 
-
     @ipcalc.command(help="Display info on an IP subnet", aliases=["ipc", "subnetinfo"])
     async def info(self, ctx, *args: str):
         if not len(args):
             await ctx.send(
                 "{mention}, this command requires an argument.".format(
-                    mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+                    mention=ctx.author.mention,
+                    command_prefix=conf.get("command_prefix"),
                 )
             )
             return
         subnet_calc.argumentList = args
         result = subnet_calc.subnet_calc_function()
 
-        embed = discord.Embed(title="IP Calculator", description="Standard IP Subnet Calc")
+        embed = discord.Embed(
+            title="IP Calculator", description="Standard IP Subnet Calc"
+        )
         embed.add_field(name="User", value=ctx.author.mention)
         embed.add_field(
             name="Question",
             value="{}".format(
-                discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
+                discord.utils.escape_markdown(
+                    discord.utils.escape_mentions(" ".join(args))
+                )
             ),
         )
         embed.add_field(name="Answer", value=result, inline=False)
@@ -387,13 +392,13 @@ class IPCalc(commands.Cog):
         elif not result:
             await ctx.send("`Something went wrong, contact a Mod.`")
 
-
     @ipcalc.command(help="Check if two IP subnets overlap", aliases=["overlap", "cc"])
     async def collision(self, ctx, *args: str):
         if not len(args):
             await ctx.send(
                 "{mention}, this command requires an argument.".format(
-                    mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+                    mention=ctx.author.mention,
+                    command_prefix=conf.get("command_prefix"),
                 )
             )
             return
@@ -407,7 +412,9 @@ class IPCalc(commands.Cog):
         embed.add_field(
             name="Question",
             value="{}".format(
-                discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
+                discord.utils.escape_markdown(
+                    discord.utils.escape_mentions(" ".join(args))
+                )
             ),
         )
         embed.add_field(name="Answer", value=result, inline=False)
@@ -425,7 +432,7 @@ class IPCalc(commands.Cog):
 async def accept(ctx, answer: str = None):
     if answer != None:
         # Strip special characters from the answer
-        answer = re.sub(r'\W','',answer)
+        answer = re.sub(r"\W", "", answer)
     if answer == None:
         await ctx.send(
             "*****{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(
@@ -517,6 +524,7 @@ async def on_message(message):
     await asyncio.create_task(process_noncommands(message))
     # Process commands using the discord.py bot module
     await asyncio.create_task(bot.process_commands(message))
+
 
 bot.add_cog(Core(bot))
 bot.add_cog(BackgroundTimer(bot))
