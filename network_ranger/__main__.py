@@ -64,6 +64,7 @@ bot = commands.Bot(
 
 bot.add_cog(BackgroundTimer(bot))
 
+
 async def clear_member_roles(member, roletype: str):
     for role in member.roles:
         if role.name.startswith(roletype + ":"):
@@ -420,7 +421,7 @@ async def collision(ctx, *args: str):
 async def accept(ctx, answer: str = None):
     if answer != None:
         # Strip special characters from the answer
-        answer = re.sub(r'\W','',answer)
+        answer = re.sub(r"\W", "", answer)
     if answer == None:
         await ctx.send(
             "*****{mention}, you've forgotten to answer your assigned question. Try: `{command_prefix}accept <ANSWER>`".format(

@@ -50,8 +50,12 @@ class BackgroundTimer(commands.Cog):
         # Build a list of members to kick if they've been sitting in the welcome channel more than 3 days.
         warning_seconds = 172800
         kick_seconds = 259200
-        welcomechannel = discord.utils.get(self.bot.guilds[0].channels, name=conf.get("welcomechannel_name"))
-        memberrole = discord.utils.get(self.bot.guilds[0].roles, name=conf.get("memberrole_name"))
+        welcomechannel = discord.utils.get(
+            self.bot.guilds[0].channels, name=conf.get("welcomechannel_name")
+        )
+        memberrole = discord.utils.get(
+            self.bot.guilds[0].roles, name=conf.get("memberrole_name")
+        )
         for member in welcomechannel.members:
             if memberrole not in member.roles and not member.bot:
                 time_on_server = datetime.utcnow() - member.joined_at
