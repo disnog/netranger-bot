@@ -190,7 +190,7 @@ async def botinfo(ctx):
     )
     await ctx.send(embed=embed)
 
-class UserProfiles(commands.Cog):
+class UserProfiles(commands.Cog, name="User Profiles"):
     def __init__(self, bot):
         self.bot = bot
 
