@@ -31,6 +31,7 @@ import discord
 import send_email
 import subnet_calc
 from cogs.background_timer import BackgroundTimer
+from cogs.core import Core
 from cryptography.fernet import Fernet, InvalidToken
 from db import Db
 from discord.ext import commands
@@ -190,7 +191,7 @@ async def botinfo(ctx):
     )
     await ctx.send(embed=embed)
 
-class UserProfiles(commands.Cog, name="User Profiles"):
+class UserProfiles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -346,72 +347,75 @@ class UserProfiles(commands.Cog, name="User Profiles"):
         except EmailNotValidError as e:
             await ctx.send(str(e))
 
+class IPCalc(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
-@bot.group(help="IP Subnet Calculator")
-@commands.check(is_accepted)
-async def ipcalc(ctx):
-    if ctx.invoked_subcommand is None:
-        await ctx.send(
-            "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
-        )
-
-
-@ipcalc.command(help="Display info on an IP subnet", aliases=["ipc", "subnetinfo"])
-async def info(ctx, *args: str):
-    if not len(args):
-        await ctx.send(
-            "{mention}, this command requires an argument.".format(
-                mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+    @commands.group(help="IP Subnet Calculator")
+    @commands.check(is_accepted)
+    async def ipcalc(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(
+                "{mention}: Invalid subcommand.".format(mention=ctx.author.mention)
             )
-        )
-        return
-    subnet_calc.argumentList = args
-    result = subnet_calc.subnet_calc_function()
-
-    embed = discord.Embed(title="IP Calculator", description="Standard IP Subnet Calc")
-    embed.add_field(name="User", value=ctx.author.mention)
-    embed.add_field(
-        name="Question",
-        value="{}".format(
-            discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
-        ),
-    )
-    embed.add_field(name="Answer", value=result, inline=False)
-
-    if result:
-        await ctx.send(embed=embed)
-    elif not result:
-        await ctx.send("`Something went wrong, contact a Mod.`")
 
 
-@ipcalc.command(help="Check if two IP subnets overlap", aliases=["overlap", "cc"])
-async def collision(ctx, *args: str):
-    if not len(args):
-        await ctx.send(
-            "{mention}, this command requires an argument.".format(
-                mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+    @ipcalc.command(help="Display info on an IP subnet", aliases=["ipc", "subnetinfo"])
+    async def info(self, ctx, *args: str):
+        if not len(args):
+            await ctx.send(
+                "{mention}, this command requires an argument.".format(
+                    mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+                )
             )
+            return
+        subnet_calc.argumentList = args
+        result = subnet_calc.subnet_calc_function()
+
+        embed = discord.Embed(title="IP Calculator", description="Standard IP Subnet Calc")
+        embed.add_field(name="User", value=ctx.author.mention)
+        embed.add_field(
+            name="Question",
+            value="{}".format(
+                discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
+            ),
         )
-        return
-    subnet_calc.argumentList = args
-    result = subnet_calc.subnet_collision_checker_function()
+        embed.add_field(name="Answer", value=result, inline=False)
 
-    embed = discord.Embed(
-        title="IP Calculator", description="IP Subnet Collision check feature"
-    )
-    embed.add_field(name="User", value=ctx.author.mention)
-    embed.add_field(
-        name="Question",
-        value="{}".format(
-            discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
-        ),
-    )
-    embed.add_field(name="Answer", value=result, inline=False)
+        if result:
+            await ctx.send(embed=embed)
+        elif not result:
+            await ctx.send("`Something went wrong, contact a Mod.`")
 
-    if result:
-        await ctx.send(embed=embed)
-    elif not result:
-        await ctx.send("`Something went wrong, contact a Mod.`")
+
+    @ipcalc.command(help="Check if two IP subnets overlap", aliases=["overlap", "cc"])
+    async def collision(self, ctx, *args: str):
+        if not len(args):
+            await ctx.send(
+                "{mention}, this command requires an argument.".format(
+                    mention=ctx.author.mention, command_prefix=conf.get("command_prefix")
+                )
+            )
+            return
+        subnet_calc.argumentList = args
+        result = subnet_calc.subnet_collision_checker_function()
+
+        embed = discord.Embed(
+            title="IP Calculator", description="IP Subnet Collision check feature"
+        )
+        embed.add_field(name="User", value=ctx.author.mention)
+        embed.add_field(
+            name="Question",
+            value="{}".format(
+                discord.utils.escape_markdown(discord.utils.escape_mentions(" ".join(args)))
+            ),
+        )
+        embed.add_field(name="Answer", value=result, inline=False)
+
+        if result:
+            await ctx.send(embed=embed)
+        elif not result:
+            await ctx.send("`Something went wrong, contact a mod.`")
 
 
 @bot.command(
@@ -514,7 +518,9 @@ async def on_message(message):
     # Process commands using the discord.py bot module
     await asyncio.create_task(bot.process_commands(message))
 
+bot.add_cog(Core(bot))
 bot.add_cog(BackgroundTimer(bot))
+bot.add_cog(IPCalc(bot))
 bot.add_cog(UserProfiles(bot))
 
 if __name__ == "__main__":
