@@ -45,34 +45,25 @@ class BackgroundTimer(commands.Cog):
     async def before_minutetimer(self):
         # Wait until the bot is ready
         await self.bot.wait_until_ready()
-        # TODO: Fix this so that different cogs don't need to do this over and over again.
-        #  This is terrible and we should all be ashamed.
-        # Identify the welcomechannel and memberrole objects so we can use them later.
-        self.welcomechannel = discord.utils.get(
-            self.bot.get_all_channels(),
-            guild__name=conf.get("guild_name"),
-            name=conf.get("welcomechannel_name"),
-        )
-        self.memberrole = discord.utils.get(
-            self.welcomechannel.guild.roles, name=conf.get("memberrole_name")
-        )
 
     async def prune_non_members(self):
         # Build a list of members to kick if they've been sitting in the welcome channel more than 3 days.
         warning_seconds = 172800
         kick_seconds = 259200
-        for member in self.welcomechannel.members:
-            if self.memberrole not in member.roles and not member.bot:
+        welcomechannel = discord.utils.get(self.bot.guilds[0].channels, name=conf.get("welcomechannel_name"))
+        memberrole = discord.utils.get(self.bot.guilds[0].roles, name=conf.get("memberrole_name"))
+        for member in welcomechannel.members:
+            if memberrole not in member.roles and not member.bot:
                 time_on_server = datetime.utcnow() - member.joined_at
                 if 0 <= time_on_server.total_seconds() - warning_seconds < 60:
                     # Warn them that they're going to be kicked if they continue to idle.
-                    await self.welcomechannel.send(
+                    await welcomechannel.send(
                         "{mention}, you've been idling in {welcome_channel} for {time}. If you do not "
                         "`{command_prefix}accept`, you will be removed and will need to rejoin.".format(
                             mention=member.mention,
-                            welcome_channel=self.welcomechannel.name,
+                            welcome_channel=welcomechannel.name,
                             time=time_on_server,
-                            command_prefix=conf.get("command_prefix"),
+                            command_prefix=self.bot.command_prefix,
                         )
                     )
                 if time_on_server.total_seconds() > kick_seconds:
@@ -82,7 +73,7 @@ class BackgroundTimer(commands.Cog):
                             "You are being removed from {server} because you have not accepted the rules. We'd still love"
                             " to have you if you're interested in network engineering. If you wish to rejoin, please feel"
                             " free to do so using the join link at {url}.".format(
-                                server=conf.get("guild_name"),
+                                server=self.bot.guilds[0].name,
                                 url="https://discord.neteng.xyz",
                             )
                         )
@@ -91,7 +82,7 @@ class BackgroundTimer(commands.Cog):
                     except discord.errors.HTTPException:
                         pass
                     try:
-                        await self.welcomechannel.guild.kick(
+                        await welcomechannel.guild.kick(
                             member,
                             reason="Did not accept the rules in {time}".format(
                                 time=time_on_server
