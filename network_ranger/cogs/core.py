@@ -24,7 +24,6 @@ from discord.ext import tasks, commands
 import discord
 from classes import Config
 from network_ranger.cogs.background_timer import BackgroundTimer
-from network_ranger.__main__ import IPCalc
 
 conf = Config()
 
@@ -34,7 +33,7 @@ async def is_guild_admin(ctx):
 
 
 class Core(commands.Cog):
-    loadable_cogs = {"IPCalc": {},"BackgroundTimer": {}}
+    loadable_cogs = {"BackgroundTimer": {}}
 
     def __init__(self, bot):
         self.bot = bot
