@@ -62,6 +62,7 @@ class Db:
             }
 
             op_list.append(UpdateOne({"_id": m["_id"]}, {"$set": m}, upsert=True))
+
         if len(op_list):
             self.users.bulk_write(op_list)
         self.add_first_joined_ats(guild)
