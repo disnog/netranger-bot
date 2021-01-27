@@ -64,7 +64,6 @@ bot = commands.Bot(
 
 bot.add_cog(BackgroundTimer(bot))
 
-
 async def clear_member_roles(member, roletype: str):
     for role in member.roles:
         if role.name.startswith(roletype + ":"):
