@@ -8,11 +8,11 @@ class Config:
         def __init__(self, value="", environ=None, sensitive=False):
             """A definition of variable to be stored in the Environment. May later need to specify required or type.
 
-                Args:
-                     value: Value
-                     environ (str): Name of environment variable from which to read.
-                     sensitive (bool): Hide values in output (Default: False)
-                """
+            Args:
+                 value: Value
+                 environ (str): Name of environment variable from which to read.
+                 sensitive (bool): Hide values in output (Default: False)
+            """
             self.value = value
             self.environ = environ
             self.sensitive = bool(sensitive)
@@ -20,10 +20,10 @@ class Config:
     def get(self, key, raise_on_keyerror=False):
         """Return the value from the specified self.config VarDef. Returns None if unset.
 
-            Args:
-                key (str): Key to return.
-                raise_on_keyerror (bool):   Raise if the key is not found. (Default: False)
-            """
+        Args:
+            key (str): Key to return.
+            raise_on_keyerror (bool):   Raise if the key is not found. (Default: False)
+        """
         try:
             value = self.config[key].value
             return value
@@ -62,7 +62,7 @@ __**General rules:**__
 
 __**To gain access to the rest of the server**__
 - Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
-- If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`.
+- If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`. Do not use any special characters other than the specified command prefix: {command_prefix}.
 ```
 Acme Inc has developed an application which has to send data which absolutely cannot be lost by the receiver even when the data is sent over the Internet. Which common transport layer protocol should the application use? (Your answer should be the well-known initials for the protocol.)
 ```
