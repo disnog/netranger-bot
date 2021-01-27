@@ -36,33 +36,8 @@ class Config:
         self.config = dict()
 
         # TODO: Un-hardcode this
-        welcomemessage_default = """Hi {mention}, welcome to {server}. Please _read_ and accept the rules to fully join.
-
-We'd ask that you observe the following guidelines for this server:
-
-__**This is a place for:**__
-:white_check_mark:  networking professionals to gather and share thoughts and knowledge.
-:white_check_mark:  those who want to enter the networking profession to gain exposure.
-:white_check_mark:  perhaps griping about the latest Cisco bug or mismanagement priority.
-:white_check_mark:  students and others looking to enter the profession to gain exposure and exchange knowledge.
-
-__**This is not a place intended for:**__
-:no_entry: server administration
-:no_entry: home networking
-:no_entry: [non-network] programming
-:no_entry: non-networking IT disciplines
-If you're here for any of the above, check out https://discord.neteng.xyz/other-resources.
-
-__**General rules:**__
-- No cheating, whatsoever.  Asking for or distributing braindumps will result in an immediate ban.
-- Keep this place 100% safe for work.
-- Please attempt to use the appropriate channel for your discussion.
-- Treat everyone with respect.
-- No random/unprompted DMs. (Excepting DMs to mods/admins regarding the Discord server)
-
-__**To gain access to the rest of the server**__
-- Once you accept, you will lose access to #welcome.  The guidelines are available via a pinned post in #general.
-- If you agree to the guidelines above, answer the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`. Do not use any special characters other than the specified command prefix: {command_prefix}.
+        welcomemessage_default = """Hi {mention}, welcome to {server}. Please complete joining the server by accepting the rules at <https://neteng.xyz/join>
+- Alternatively, if and only if you are in the network engineering profession, you may join by answering the following question by typing `{command_prefix}accept <ANSWER>` in this channel. e.g. if the answer is "eggs", type `{command_prefix}accept eggs`. Do not use any special characters other than the specified command prefix: {command_prefix}.
 ```
 Acme Inc has developed an application which has to send data which absolutely cannot be lost by the receiver even when the data is sent over the Internet. Which common transport layer protocol should the application use? (Your answer should be the well-known initials for the protocol.)
 ```
