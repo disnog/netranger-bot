@@ -8,11 +8,11 @@ class Config:
         def __init__(self, value="", environ=None, sensitive=False):
             """A definition of variable to be stored in the Environment. May later need to specify required or type.
 
-                Args:
-                     value: Value
-                     environ (str): Name of environment variable from which to read.
-                     sensitive (bool): Hide values in output (Default: False)
-                """
+            Args:
+                 value: Value
+                 environ (str): Name of environment variable from which to read.
+                 sensitive (bool): Hide values in output (Default: False)
+            """
             self.value = value
             self.environ = environ
             self.sensitive = bool(sensitive)
@@ -20,10 +20,10 @@ class Config:
     def get(self, key, raise_on_keyerror=False):
         """Return the value from the specified self.config VarDef. Returns None if unset.
 
-            Args:
-                key (str): Key to return.
-                raise_on_keyerror (bool):   Raise if the key is not found. (Default: False)
-            """
+        Args:
+            key (str): Key to return.
+            raise_on_keyerror (bool):   Raise if the key is not found. (Default: False)
+        """
         try:
             value = self.config[key].value
             return value
