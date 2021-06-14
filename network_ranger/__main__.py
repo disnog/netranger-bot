@@ -473,10 +473,10 @@ async def on_member_join(member):
     """
     db.add_member(member)
     permanent_roles = db.get_permanent_roles(member.id)
-    if "!eggs" in permanent_roles:
+    if "!eggs" in permanent_roles and eggsrole not in member.roles:
         # Reapply !eggs role if they had it before
         await member.add_roles(eggsrole, reason="Eggs have returned.")
-    if "Member" in permanent_roles:
+    if "Member" in permanent_roles and memberrole not in member.roles:
         # Bypass welcome channel
         await member.add_roles(memberrole)
         await memberchannel.send(
