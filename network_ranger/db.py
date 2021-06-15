@@ -130,6 +130,7 @@ class Db:
         return self.get_member(member_id)["member_number"]
 
     def get_permanent_roles(self, member_id):
+        # TODO: Disambiguate this nomenclature from nrdb get_permanent_roles
         permanent_roles = list()
         try:
             permanent_roles.extend(
