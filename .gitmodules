@@ -1,0 +1,3 @@
+[submodule "network_ranger/include/nrdb"]
+	path = network_ranger/include/nrdb
+	url = git@github.com:netdiscord/nrdb.git

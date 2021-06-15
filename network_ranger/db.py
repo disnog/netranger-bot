@@ -19,7 +19,7 @@
 from pymongo import MongoClient
 from pymongo import UpdateOne
 from pymongo import ReturnDocument
-import json
+from include import nrdb
 
 
 class Db:
@@ -43,16 +43,23 @@ class Db:
     def add_existing_members(self, guild):
         members = guild.members
         op_list = []
+        known_roles = nrdb.get_significant_roles(self.db, guild.id)
+        # Create a list of just the {id:[significance,...]}
+        known_role_dict = dict()
+        [
+            known_role_dict.update({role["id"]: role["significance"]})
+            for role in known_roles
+        ]
         for member in members:
             if member.bot:
                 # Do not add bots to the DB.
                 continue
             permanent_roles = []
             for role in member.roles:
-                if role.name == "Members" or role.name == "Member":
-                    permanent_roles.append("Member")
-                elif role.name == "!eggs":
-                    permanent_roles.append("!eggs")
+                if role.id in known_role_dict.keys():
+                    for permrolename in known_role_dict[role.id]:
+                        permanent_roles.append(permrolename)
+
             m = {
                 "_id": member.id,
                 "name": member.name,
