@@ -56,8 +56,8 @@ class Db:
                 continue
             permanent_roles = []
             for role in member.roles:
-                if role.id in known_role_dict.keys():
-                    for permrolename in known_role_dict[role.id]:
+                if str(role.id) in known_role_dict.keys():
+                    for permrolename in known_role_dict[str(role.id)]:
                         permanent_roles.append(permrolename)
 
             m = {
