@@ -52,8 +52,11 @@ else:
     db = False
     print("DB configuration not present; not attempting to connect to DB.")
 
+intents = discord.Intents.default()
+intents.members = True
 bot = commands.Bot(
     command_prefix=conf.get("command_prefix"),
+    intents=intents,
     description=conf.get("bot_description"),
     activity=discord.Activity(
         type=discord.ActivityType.playing,
