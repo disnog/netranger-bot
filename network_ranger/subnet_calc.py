@@ -49,29 +49,35 @@ def subnet_calc_function():
 
         # if the user have typed in full netmask after the ip address then parser it here:
         elif len(argumentList) > 1:
-            # IPv4 or IPv6 address + full mask
-            subnet_1 = ipcalc.Network(argumentList[0], argumentList[1])
-            if subnet_1.version() == 4:
-                message = (
-                    f"Network: {subnet_1.network()} {subnet_1.netmask()}"
-                    f"\nNetwork Address: {subnet_1.network()}"
-                    f"\nBroadcast Address: {subnet_1.broadcast()}"
-                    f"\nFirst usable host in subnet: {subnet_1.host_first()}"
-                    f"\nLast usable host in subnet: {subnet_1.host_last()}"
-                )
+            input_validation = re.match(
+                RP_IPV4FULLMASK, argumentList[0] + " " + argumentList[1]
+            )
+            if input_validation:
+                # IPv4 or IPv6 address + full mask
+                subnet_1 = ipcalc.Network(argumentList[0], argumentList[1])
+                if subnet_1.version() == 4:
+                    message = (
+                        f"Network: {subnet_1.network()} {subnet_1.netmask()}"
+                        f"\nNetwork Address: {subnet_1.network()}"
+                        f"\nBroadcast Address: {subnet_1.broadcast()}"
+                        f"\nFirst usable host in subnet: {subnet_1.host_first()}"
+                        f"\nLast usable host in subnet: {subnet_1.host_last()}"
+                    )
 
-            # IPv6 return message which also is truncated using `.to_compressed()` method
-            elif subnet_1.version() == 6:
+                # IPv6 return message which also is truncated using `.to_compressed()` method
+                elif subnet_1.version() == 6:
 
-                # Creating IPv6 message
-                message = (
-                    f"Network: {subnet_1.network().to_compressed()}/{subnet_1.subnet()}"
-                    f"\nNetwork Address: {subnet_1.network().to_compressed()}"
-                    f"\nBroadcast Address: {subnet_1.broadcast().to_compressed()}"
-                    f"\nFirst usable host in subnet: {subnet_1.host_first().to_compressed()}"
-                    f"\nLast usable host in subnet: {subnet_1.host_last().to_compressed()}"
-                )
-            return message
+                    # Creating IPv6 message
+                    message = (
+                        f"Network: {subnet_1.network().to_compressed()}/{subnet_1.subnet()}"
+                        f"\nNetwork Address: {subnet_1.network().to_compressed()}"
+                        f"\nBroadcast Address: {subnet_1.broadcast().to_compressed()}"
+                        f"\nFirst usable host in subnet: {subnet_1.host_first().to_compressed()}"
+                        f"\nLast usable host in subnet: {subnet_1.host_last().to_compressed()}"
+                    )
+                return message
+            else:
+                return error_message
 
         # if by any means no args were passed, just return an error message.
         else:
@@ -143,6 +149,10 @@ def subnet_collision_checker_function():
             )
             return error_message
 
+
+# Regular Expressions
+RP_IPV4FULLMASK = r"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)( )((((255\.){3}(255|254|252|248|240|224|192|128|0+))|((255\.){2}(255|254|252|248|240|224|192|128|0+)\.0)|((255\.)(255|254|252|248|240|224|192|128|0+)(\.0+){2})|((255|254|252|248|240|224|192|128|0+)(\.0+){3})))$"
+RP_FULLCIDRv4 = r"^((?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)(\/)(0?[1-9]|[12]\d|3[012]) ?)+$"
 
 
 # __main__ need to fill out this list for the functions to run.
