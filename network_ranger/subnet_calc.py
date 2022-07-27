@@ -71,6 +71,7 @@ def subnet_calc_function():
                     f"\nFirst usable host in subnet: {subnet_1.host_first().to_compressed()}"
                     f"\nLast usable host in subnet: {subnet_1.host_last().to_compressed()}"
                 )
+            return message
 
         # if by any means no args were passed, just return an error message.
         else:
