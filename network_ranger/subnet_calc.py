@@ -8,9 +8,9 @@ def subnet_calc_function():
     error_message = (
         "Invalid input."
         "\nUse syntax: "
-        "\n-ipc 10.10.10.2/23"
+        "\n-ipcalc info 10.10.10.2/23"
         "\nor"
-        "\n-ipc 2001:db8:2001::10/64"
+        "\n-ipcalc info 2001:db8:2001::10/64"
     )
 
     # First check if there is one or multiple args (CIDR or full_mask).
@@ -64,7 +64,11 @@ def subnet_calc_function():
                         f"\nLast usable host in subnet: {subnet_1.host_last()}"
                     )
 
+                # This section won't be available due to regex match which only contains IPv4
+                # leaving this section for future reference and improvement of the input validation.
+
                 # IPv6 return message which also is truncated using `.to_compressed()` method
+
                 elif subnet_1.version() == 6:
 
                     # Creating IPv6 message
@@ -116,11 +120,11 @@ def subnet_collision_checker_function():
         error_message = (
             "Invalid input"
             "\nuse syntax:"
-            "\n-ipcc 10.10.10.5/29 10.10.10.16/28"
-            "\nor \n-ipcc 2001:db8:2000::1/64 2001:db8:2001::10/64"
+            "\n-ipcalc collision 10.10.10.5/29 10.10.10.16/28"
+            "\nor"
+            "\n-ipcalc collision 2001:db8:2000::1/64 2001:db8:2001::10/64"
         )
         return error_message
-
 
 
 # Checks args list and if passed runs the calculation
