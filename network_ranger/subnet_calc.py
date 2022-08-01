@@ -106,15 +106,16 @@ def subnet_collision_checker_function():
 
         # if either of the inputs are an IPv6 address, then compress the result.
         if subnet_1.version() == 6:
-            subnet_1 = subnet_1.to_compressed()
+            subnet_1 = f"{subnet_1.to_compressed()}/{subnet_1.subnet()}"
+
         if subnet_2.version() == 6:
-            subnet_2 = subnet_2.to_compressed()
+            subnet_2 = f"{subnet_2.to_compressed()}/{subnet_2.subnet()}"
 
         # Boolean checks and return a message depending on the statement.
         if check_subnets:
             return f"IP address {subnet_1} and {subnet_2} is in the same subnet."
         elif check_subnets == False:
-            return f"IP address {subnet_1} and {subnet_2} is not the same subnet."
+            return f"IP address {subnet_1} and {subnet_2} is not in the same subnet."
 
     except Exception as e:
         error_message = (
