@@ -63,11 +63,10 @@ class BackgroundTimer(commands.Cog):
                     # Warn them that they're going to be kicked if they continue to idle.
                     await welcomechannel.send(
                         "{mention}, you've been idling in {welcome_channel} for {time}. If you do not "
-                        "`{command_prefix}accept`, you will be removed and will need to rejoin.".format(
+                        "complete the join process, you will be removed and will need to rejoin.".format(
                             mention=member.mention,
                             welcome_channel=welcomechannel.name,
                             time=time_on_server,
-                            command_prefix=self.bot.command_prefix,
                         )
                     )
                 if time_on_server.total_seconds() > kick_seconds:
