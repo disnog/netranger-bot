@@ -103,7 +103,7 @@ class RolesCog(commands.Cog, name="Roles"):
         key = fernet.encrypt(key_data.encode()).decode()
         
         # Send email
-        subject = "Networking Discord Email Validation Key"
+        subject = "DisNOG Email Validation Key"
         body = f"""Your validation key is:
 
 {key}

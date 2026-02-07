@@ -1,6 +1,6 @@
 # netranger-bot
 
-Discord bot for the Networking Discord server. Built with discord.py 2.x using slash commands.
+Discord bot for the DisNOG server. Built with discord.py 2.x using slash commands.
 
 ## Installation
 
