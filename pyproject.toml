@@ -32,3 +32,6 @@ netranger-bot = "network_ranger.__main__:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["network_ranger"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
