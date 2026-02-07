@@ -1,7 +1,13 @@
-FROM python:3.7
-WORKDIR /usr/src/app
-COPY requirements.txt ./
-COPY network_ranger ./network_ranger
-RUN pip install --no-cache-dir -r requirements.txt
+FROM python:3.12-slim
 
-CMD [ "python3", "network_ranger" ]
+WORKDIR /app
+
+# Install dependencies
+COPY pyproject.toml README.md ./
+RUN pip install --no-cache-dir .
+
+# Copy application
+COPY network_ranger/ ./network_ranger/
+
+# Run
+CMD ["python", "-m", "network_ranger"]
