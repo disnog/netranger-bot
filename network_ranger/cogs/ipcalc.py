@@ -48,11 +48,6 @@ class IPCalcCog(commands.Cog, name="IP Calculator"):
             )
             return
         
-        # Calculate info
-        if network.version == 4:
-            info = self._ipv4_info(network)
-        else:
-            info = self._ipv6_info(network)
         
         embed = discord.Embed(
             title="IP Subnet Calculator",
