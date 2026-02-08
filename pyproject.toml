@@ -18,7 +18,7 @@ dependencies = [
     "cryptography>=42.0.0",
     "email-validator>=2.1.0",
     "aiosmtplib>=3.0.0",
-    "netranger-db @ git+https://github.com/isfarathu/netranger-db.git@v2-mariadb-rewrite",
+    "netranger-db @ git+https://github.com/disnog/netranger-db.git@v2dev",
 ]
 
 [project.optional-dependencies]
