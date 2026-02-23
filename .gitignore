@@ -14,3 +14,13 @@ ENV/
 .mypy_cache/
 .coverage
 htmlcov/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+.Spotlight-V100
+.Trashes
