@@ -24,58 +24,56 @@ spec:
     spec:
       containers:
         - name: network-ranger
-          image: netdiscord/network-ranger:latest
+          image: ghcr.io/disnog/netranger-bot:latest
           env:
             - name: TOKEN
               valueFrom:
                 secretKeyRef:
                   name: network-ranger
                   key: TOKEN
+            - name: GUILD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: network-ranger
+                  key: GUILD_ID
             - name: BOT_DESCRIPTION
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: BOT_DESCRIPTION
-            - name: COMMAND_PREFIX
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: COMMAND_PREFIX
-            - name: LOGCHANNEL_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: LOGCHANNEL_NAME
-            - name: MEMBERCHANNEL_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: MEMBERCHANNEL_NAME
-            - name: MEMBERROLE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: MEMBERROLE_NAME
-            - name: EGGSROLE_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: EGGSROLE_NAME
+              value: "Network Ranger"
             - name: WELCOMECHANNEL_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: WELCOMECHANNEL_NAME
-            - name: GUILD_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: GUILD_NAME
+              value: "welcome"
+            - name: MEMBERCHANNEL_NAME
+              value: "general"
+            - name: LOGCHANNEL_NAME
+              value: "cnc"
             - name: MIRRORCHANNEL_NAME
+              value: "mirror"
+            - name: MEMBERROLE_NAME
+              value: "Members"
+            - name: DB_HOST
               valueFrom:
                 secretKeyRef:
                   name: network-ranger
-                  key: MIRRORCHANNEL_NAME
+                  key: DB_HOST
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: network-ranger
+                  key: DB_USER
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: network-ranger
+                  key: DB_PASS
+            - name: DB_NAME
+              value: "netranger"
+            - name: SMTP_SERVER
+              valueFrom:
+                secretKeyRef:
+                  name: network-ranger
+                  key: SMTP_SERVER
+            - name: SMTP_PORT
+              value: "587"
             - name: SMTP_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -86,16 +84,6 @@ spec:
                 secretKeyRef:
                   name: network-ranger
                   key: SMTP_PASSWORD
-            - name: SMTP_SERVER
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: SMTP_SERVER
-            - name: SMTP_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: network-ranger
-                  key: SMTP_PORT
             - name: SMTP_FROMEMAIL
               valueFrom:
                 secretKeyRef:
@@ -106,16 +94,3 @@ spec:
                 secretKeyRef:
                   name: network-ranger
                   key: SECRETKEY
-            - name: DB_HOST
-              value: "mongodb"
-            - name: DB_PORT
-              value: "27017"
-            - name: DB_USER
-              value: "root"
-            - name: DB_NAME
-              value: "network_ranger"
-            - name: DB_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: mongodb
-                  key: mongodb-root-password

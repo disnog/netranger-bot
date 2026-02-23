@@ -1,1 +1,1 @@
-worker:        python3 network_ranger
+worker: python3 -m network_ranger

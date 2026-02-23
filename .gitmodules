@@ -1,3 +1,0 @@
-[submodule "network_ranger/include/nrdb"]
-	path = network_ranger/include/nrdb
-	url = https://github.com/disnog/netranger-db.git
