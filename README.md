@@ -79,7 +79,7 @@ docker run --env-file .env netranger-bot
 
 ## Features
 
-- **Member onboarding**: Welcome messages and automatic role assignment on join
+- **Member onboarding**: Welcome messages plus `/join` guidance for unaccepted users
 - **Returning members**: Remembers member numbers and roles across leave/rejoin
 - **IP Calculator**: Subnet calculations and overlap checking
 - **Org verification**: Email-based organization affiliation roles

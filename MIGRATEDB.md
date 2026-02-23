@@ -72,7 +72,6 @@ export MIRRORCHANNEL_NAME=mirror
 
 # Optional - Role names (defaults shown)
 export MEMBERROLE_NAME=Members
-export EGGSROLE_NAME=!eggs
 
 # Optional - Email verification
 export SMTP_SERVER=smtp.example.com
@@ -89,7 +88,7 @@ export SECRETKEY=your_fernet_key
 
 | Old | New | Notes |
 |-----|-----|-------|
-| `$accept <answer>` | `/accept answer:<text>` | |
+| `$accept <answer>` | Web `/join` flow at `https://disnog.org/join` | Membership acceptance moved to web |
 | `$myinfo` | `/myinfo` | |
 | `$ipcalc info <subnet>` | `/ipcalc subnet:<text>` | |
 | `$ipcalc collision <a> <b>` | `/ipoverlap subnet1:<text> subnet2:<text>` | Renamed |
@@ -110,7 +109,7 @@ Slash commands use Discord's built-in permission system:
 ## Installation
 
 ```bash
-pip install git+https://github.com/disnog/netranger-bot.git
+pip install git+https://github.com/disnog/netranger-bot.git@v2dev
 ```
 
 ## Running
@@ -148,7 +147,7 @@ network_ranger/
 ├── bot.py           # Main bot class
 ├── config.py        # Configuration
 └── cogs/
-    ├── onboarding.py   # /accept, /myinfo, member events
+    ├── onboarding.py   # /myinfo, member events, role restoration
     ├── ipcalc.py       # /ipcalc, /ipoverlap
     ├── roles.py        # /sendkey, /orgset, /orgclear
     └── moderation.py   # /botinfo, /lookup, /syncdb
@@ -164,11 +163,11 @@ network_ranger/
 - [ ] Deploy new bot version
 - [ ] Verify slash commands appear (may take minutes)
 - [ ] Test core functionality:
-  - [ ] `/accept tcp` grants member role
+  - [ ] Web `/join` flow grants selected role before guild join
   - [ ] `/myinfo` shows profile
   - [ ] `/ipcalc 192.168.1.0/24` shows subnet info
-  - [ ] Member join triggers welcome message
-  - [ ] Returning members bypass welcome
+  - [ ] New members without accepted roles are prompted to use `/join`
+  - [ ] Returning members get permanent roles restored and member number retained
 
 ## Troubleshooting
 

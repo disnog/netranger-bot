@@ -36,6 +36,36 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
 
     def __init__(self, bot: "NetworkRanger"):
         self.bot = bot
+
+    async def _resolve_permanent_discord_roles(
+        self,
+        guild: discord.Guild,
+        permanent_roles: list[str],
+    ) -> list[discord.Role]:
+        """Resolve DB permanent-role significances to Discord role objects."""
+        db_guild = await self.bot.db.guilds.get(str(guild.id))
+        if not db_guild:
+            return []
+
+        significance_to_role_ids: dict[str, set[str]] = {}
+        for known_role in db_guild.known_roles:
+            for significance in known_role.significances:
+                significance_to_role_ids.setdefault(significance, set()).add(
+                    known_role.role_id
+                )
+
+        resolved: list[discord.Role] = []
+        seen_ids: set[int] = set()
+        for significance in permanent_roles:
+            for role_id in significance_to_role_ids.get(significance, set()):
+                try:
+                    role = guild.get_role(int(role_id))
+                except ValueError:
+                    role = None
+                if role and role.id not in seen_ids:
+                    resolved.append(role)
+                    seen_ids.add(role.id)
+        return resolved
     
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
@@ -61,43 +91,41 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
         member_channel = self.bot.get_member_channel(guild)
         welcome_channel = self.bot.get_welcome_channel(guild)
 
-        if "Member" in permanent_roles and member_role:
-            # Returning member - restore their roles
-            await member.add_roles(member_role, reason="Returning member")
+        # Restore any saved permanent roles from DB mappings.
+        roles_to_add = await self._resolve_permanent_discord_roles(guild, permanent_roles)
 
-            # Assign member number if they don't have one
-            member_number = await self.bot.db.users.get_member_number(member.id)
-            if not member_number:
-                member_number = await self.bot.db.users.assign_member_number(member.id)
+        # Fallback if DB role mappings are incomplete but Member role exists by name.
+        if "Member" in permanent_roles and member_role and member_role not in roles_to_add:
+            roles_to_add.append(member_role)
 
-            if member_channel:
-                await member_channel.send(
-                    f"{member.mention}, welcome back to {guild.name}! "
-                    f"We've held on to your previous member number, #{member_number}."
-                )
-        else:
-            # New member - add member role automatically and assign number
-            if member_role:
-                await member.add_roles(member_role, reason="New member")
-                await self.bot.db.users.add_permanent_role(member.id, "Member")
-                member_number = await self.bot.db.users.assign_member_number(member.id)
+        roles_to_restore = [role for role in roles_to_add if role not in member.roles]
+        if roles_to_restore:
+            await member.add_roles(*roles_to_restore, reason="Restoring permanent roles")
 
-                # Send welcome message
-                if welcome_channel:
-                    await welcome_channel.send(
-                        f"Hi {member.mention}, welcome to {guild.name}! You are member #{member_number}."
-                    )
-
+        if "Member" in permanent_roles:
+            existing_number = await self.bot.db.users.get_member_number(member.id)
+            if existing_number:
                 if member_channel:
                     await member_channel.send(
-                        f"{member.mention}, welcome to {guild.name}! You are member #{member_number}, "
-                        f"and we're glad to have you. Feel free to take a moment to introduce yourself!"
+                        f"{member.mention}, welcome back to {guild.name}! "
+                        f"We've held on to your previous member number, #{existing_number}."
                     )
-            elif welcome_channel:
-                # Fallback if member role not configured
-                await welcome_channel.send(
-                    f"Hi {member.mention}, welcome to {guild.name}!"
+                return
+
+            member_number = await self.bot.db.users.assign_member_number(member.id)
+            target_channel = member_channel or welcome_channel
+            if target_channel:
+                await target_channel.send(
+                    f"{member.mention}, welcome to {guild.name}! You are member #{member_number}."
                 )
+            return
+
+        # No accepted permanent role yet: keep user unaccepted and point them to web join.
+        if welcome_channel:
+            await welcome_channel.send(
+                f"Hi {member.mention}, welcome to {guild.name}. "
+                "Please complete joining by accepting the rules at <https://disnog.org/join>."
+            )
     
     @app_commands.command(name="myinfo", description="Show your member profile")
     async def myinfo(self, interaction: discord.Interaction):
