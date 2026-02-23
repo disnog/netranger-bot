@@ -68,7 +68,7 @@ def subnet_collision_checker_function():
                 return "IP address {} and {} is in the same subnet.".format(
                     subnet_1, subnet_2
                 )
-            elif check_subnets == False:
+            elif not check_subnets:
                 return "IP address {} and {} is not the same subnet.".format(
                     subnet_1, subnet_2
                 )

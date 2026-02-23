@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main, next, v2dev]
+  pull_request:
+    branches: [master, main, next, v2dev]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install .[dev]
+      - name: Run tests
+        env:
+          TOKEN: ci-placeholder-token
+          GUILD_ID: "123456789"
+        run: pytest -v --cov=network_ranger --cov-report=term-missing
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t netranger-bot .

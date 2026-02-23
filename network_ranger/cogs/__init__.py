@@ -14,11 +14,4 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-"""Network Ranger Discord bot."""
-
-__version__ = "2.0.0"
-
-from .bot import NetworkRanger
-from .config import Config
-
-__all__ = ["NetworkRanger", "Config"]
+"""Bot cogs (command modules)."""
