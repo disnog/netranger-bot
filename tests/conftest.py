@@ -57,8 +57,13 @@ def mock_interaction():
     interaction = AsyncMock()
     interaction.response = AsyncMock()
     interaction.response.send_message = AsyncMock()
+    interaction.followup = AsyncMock()
+    interaction.followup.send = AsyncMock()
     interaction.guild = MagicMock()
     interaction.guild.id = 123456789
     interaction.user = MagicMock()
     interaction.user.id = 111222333
+    interaction.user.roles = []
+    interaction.user.add_roles = AsyncMock()
+    interaction.user.remove_roles = AsyncMock()
     return interaction

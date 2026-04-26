@@ -88,7 +88,7 @@ export SECRETKEY=your_fernet_key
 
 | Old | New | Notes |
 |-----|-----|-------|
-| `$accept <answer>` | Web `/join` flow at `https://disnog.org/join` | Membership acceptance moved to web |
+| `$accept <answer>` | Web `/join` flow at `https://disnog.org/join` | Membership acceptance moved to web; the special `$accept eggs` path was removed |
 | `$myinfo` | `/myinfo` | |
 | `$ipcalc info <subnet>` | `/ipcalc subnet:<text>` | |
 | `$ipcalc collision <a> <b>` | `/ipoverlap subnet1:<text> subnet2:<text>` | Renamed |
@@ -102,9 +102,18 @@ export SECRETKEY=your_fernet_key
 ### Permission Changes
 
 Slash commands use Discord's built-in permission system:
+- `/sendkey` - Requires a completed accepted join flow (`Member`, `periphery`, or `recruiter`)
+- `/orgset` - Requires a completed accepted join flow (`Member`, `periphery`, or `recruiter`)
+- `/orgclear` - Requires a completed accepted join flow (`Member`, `periphery`, or `recruiter`)
 - `/botinfo` - Requires "Ban Members" permission
 - `/lookup` - Requires "Ban Members" permission
 - `/syncdb` - Requires "Administrator" permission
+
+### Removed Legacy Behavior
+
+- The challenge-question `$accept` flow was removed in favor of the web `/join` flow.
+- The special `$accept eggs` / persistent `!eggs` role behavior was removed.
+- There is no `!eggs` replacement path in `v2dev`.
 
 ## Installation
 

@@ -70,9 +70,9 @@ docker run --env-file .env netranger-bot
 | `/myinfo` | Show your member profile | Everyone |
 | `/ipcalc <subnet>` | Calculate IP subnet info | Everyone |
 | `/ipoverlap <subnet1> <subnet2>` | Check if subnets overlap | Everyone |
-| `/sendkey <email>` | Send email verification key | Everyone |
-| `/orgset <key>` | Set org affiliation role | Everyone |
-| `/orgclear` | Remove org affiliation | Everyone |
+| `/sendkey <email>` | Send email verification key | Accepted members |
+| `/orgset <key>` | Set org affiliation role | Accepted members |
+| `/orgclear` | Remove org affiliation | Accepted members |
 | `/botinfo` | Show bot information | Moderators |
 | `/lookup <member>` | Look up member database info | Moderators |
 | `/syncdb` | Force sync members to database | Admins |
@@ -83,6 +83,8 @@ docker run --env-file .env netranger-bot
 - **Returning members**: Remembers member numbers and roles across leave/rejoin
 - **IP Calculator**: Subnet calculations and overlap checking
 - **Org verification**: Email-based organization affiliation roles
+
+Removed in `v2dev`: the legacy `$accept eggs` / persistent `!eggs` flow. There is no replacement path for `!eggs`.
 
 ## Bot Permissions
 

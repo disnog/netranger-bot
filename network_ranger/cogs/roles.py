@@ -35,6 +35,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+ACCEPTED_PERMANENT_ROLES = frozenset({"Member", "periphery", "recruiter"})
+
 
 class RolesCog(commands.Cog, name="Roles"):
     """Role management including org verification."""
@@ -47,6 +49,19 @@ class RolesCog(commands.Cog, name="Roles"):
         if not self.bot.config.secret_key:
             return None
         return Fernet(self.bot.config.secret_key.encode())
+
+    async def _require_accepted_member(self, interaction: discord.Interaction) -> bool:
+        """Require a user to have completed the accepted join flow."""
+        user = await self.bot.db.users.get(interaction.user.id)
+        permanent_roles = set(user.permanent_roles if user else [])
+        if permanent_roles.intersection(ACCEPTED_PERMANENT_ROLES):
+            return True
+
+        await interaction.response.send_message(
+            "Please complete joining at <https://disnog.org/join> before using org affiliation commands.",
+            ephemeral=True,
+        )
+        return False
     
     async def _send_email(self, to: str, subject: str, body: str) -> bool:
         """Send an email."""
@@ -77,6 +92,9 @@ class RolesCog(commands.Cog, name="Roles"):
     @app_commands.describe(email="Your work email address")
     async def sendkey(self, interaction: discord.Interaction, email: str):
         """Send email verification key."""
+        if not await self._require_accepted_member(interaction):
+            return
+
         # Validate email
         try:
             valid = validate_email(email)
@@ -132,6 +150,9 @@ Note: This will remove your current org affiliation role, if any.
     @app_commands.describe(key="The verification key from your email")
     async def orgset(self, interaction: discord.Interaction, key: str):
         """Set org affiliation role using email key."""
+        if not await self._require_accepted_member(interaction):
+            return
+
         fernet = self._get_fernet()
         if not fernet:
             await interaction.response.send_message(
@@ -189,6 +210,9 @@ Note: This will remove your current org affiliation role, if any.
     @app_commands.command(name="orgclear", description="Remove your org affiliation role")
     async def orgclear(self, interaction: discord.Interaction):
         """Clear org affiliation."""
+        if not await self._require_accepted_member(interaction):
+            return
+
         member = interaction.user
         removed = False
         
