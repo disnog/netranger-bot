@@ -122,9 +122,7 @@ class NetworkRanger(commands.Bot):
                 member.joined_at,
             )
             
-            # Add permanent roles
-            for role_sig in permanent_roles:
-                await self.db.users.add_permanent_role(member.id, role_sig)
+            await self.db.users.set_permanent_roles(member.id, permanent_roles)
             
             count += 1
         

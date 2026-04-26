@@ -7,10 +7,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /
 
 # Install dependencies
 COPY pyproject.toml README.md ./
-RUN pip install --no-cache-dir .
-
-# Copy application
 COPY network_ranger/ ./network_ranger/
+RUN pip install --no-cache-dir .
 
 # Run
 CMD ["python", "-m", "network_ranger"]

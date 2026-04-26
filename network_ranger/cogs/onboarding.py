@@ -30,6 +30,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+ACCEPTED_PERMANENT_ROLES = frozenset({"Member", "periphery", "recruiter"})
+
 
 class OnboardingCog(commands.Cog, name="Onboarding"):
     """Handles member onboarding flow."""
@@ -102,7 +104,8 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
         if roles_to_restore:
             await member.add_roles(*roles_to_restore, reason="Restoring permanent roles")
 
-        if "Member" in permanent_roles:
+        accepted_roles = set(permanent_roles).intersection(ACCEPTED_PERMANENT_ROLES)
+        if "Member" in accepted_roles:
             existing_number = await self.bot.db.users.get_member_number(member.id)
             if existing_number:
                 if member_channel:
@@ -117,6 +120,15 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
             if target_channel:
                 await target_channel.send(
                     f"{member.mention}, welcome to {guild.name}! You are member #{member_number}."
+                )
+            return
+
+        if accepted_roles:
+            target_channel = member_channel or welcome_channel
+            if target_channel:
+                await target_channel.send(
+                    f"{member.mention}, welcome back to {guild.name}! "
+                    "Your roles have been restored."
                 )
             return
 

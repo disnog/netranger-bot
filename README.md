@@ -81,6 +81,8 @@ docker run --env-file .env netranger-bot
 
 - **Member onboarding**: Welcome messages plus `/join` guidance for unaccepted users
 - **Returning members**: Remembers member numbers and roles across leave/rejoin
+- **Current-member sync**: Startup and `/syncdb` replace stored permanent roles
+  for current guild members from their current Discord roles
 - **IP Calculator**: Subnet calculations and overlap checking
 - **Org verification**: Email-based organization affiliation roles
 

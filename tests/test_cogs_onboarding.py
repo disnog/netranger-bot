@@ -116,3 +116,37 @@ async def test_member_without_number_gets_assigned_number(onboarding_cog, mock_b
     mock_bot.db.users.assign_member_number.assert_awaited_once_with(member.id)
     member_channel.send.assert_awaited_once()
     assert "#77" in member_channel.send.await_args.args[0]
+
+
+@pytest.mark.asyncio
+async def test_returning_periphery_member_does_not_get_join_prompt(onboarding_cog, mock_bot):
+    member = _build_member()
+    periphery_role = MagicMock()
+    member_channel = MagicMock()
+    member_channel.send = AsyncMock()
+    welcome_channel = MagicMock()
+    welcome_channel.send = AsyncMock()
+
+    mock_bot.db.users.upsert = AsyncMock()
+    mock_bot.db.users.get_permanent_roles = AsyncMock(return_value=["periphery"])
+    mock_bot.db.users.get_member_number = AsyncMock()
+    mock_bot.db.users.assign_member_number = AsyncMock()
+    mock_bot.db.guilds.get = AsyncMock(
+        return_value=SimpleNamespace(
+            known_roles=[
+                SimpleNamespace(role_id="555666777888999000", significances=["periphery"])
+            ]
+        )
+    )
+    member.guild.get_role.return_value = periphery_role
+    mock_bot.get_member_role.return_value = MagicMock()
+    mock_bot.get_member_channel.return_value = member_channel
+    mock_bot.get_welcome_channel.return_value = welcome_channel
+
+    await onboarding_cog.on_member_join(member)
+
+    member.add_roles.assert_awaited_once_with(periphery_role, reason="Restoring permanent roles")
+    mock_bot.db.users.assign_member_number.assert_not_awaited()
+    member_channel.send.assert_awaited_once()
+    welcome_channel.send.assert_not_awaited()
+    assert "welcome back" in member_channel.send.await_args.args[0].lower()

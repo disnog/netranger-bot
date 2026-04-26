@@ -146,6 +146,12 @@ On first startup, the bot will:
 3. Sync slash commands to your guild
 4. Sync existing members to the database
 
+For current guild members, startup sync and `/syncdb` replace stored permanent
+roles with the roles currently present in Discord. This preserves the main
+branch behavior where current Discord role state is authoritative for members
+who are still in the guild. Returning members who are not currently in the guild
+keep their stored permanent roles for restoration on rejoin.
+
 **Note**: Slash command sync may take a few minutes to propagate.
 
 ## Cog Structure
@@ -177,6 +183,8 @@ network_ranger/
   - [ ] `/ipcalc 192.168.1.0/24` shows subnet info
   - [ ] New members without accepted roles are prompted to use `/join`
   - [ ] Returning members get permanent roles restored and member number retained
+  - [ ] Returning `periphery` and `recruiter` users are welcomed back without being sent to `/join`
+  - [ ] `/syncdb` removes stale stored roles from current members after a Discord role is removed
 
 ## Troubleshooting
 
