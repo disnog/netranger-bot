@@ -45,6 +45,8 @@ Modernize the Discord bot from prefix commands and direct MongoDB access to disc
 - Bot starts, connects to MariaDB, loads cogs, and syncs slash commands.
 - Startup sync preserves current Discord role state for current members.
 - Returning Member users keep their member number.
+- New members who join through web are not greeted as returning members.
+- Current Members without a member number are numbered in join order at startup.
 - Returning periphery/recruiter users do not get sent back through `/join`.
 - Org verification commands are gated to accepted users.
 - Docker image builds successfully.
@@ -55,3 +57,6 @@ Modernize the Discord bot from prefix commands and direct MongoDB access to disc
 - Fixed during audit: Dockerfile now copies package code before `pip install .`.
 - Fixed during audit: returning periphery/recruiter users are welcomed back instead of being treated as unaccepted.
 - Fixed during audit: startup sync now replaces stored permanent roles for current members to avoid stale role restoration.
+- Fixed after review: members added by web `/join` arrive with their roles attached and are no longer told "welcome back"; web posts the welcome to the greeting channel.
+- Fixed after review: startup sync numbers current Members without a number, in join order, and runs once per process instead of on every `on_ready`.
+- Fixed after review: ruff rules are pinned (`select = ["E", "F", "I"]`) so CI lint doesn't change with new ruff releases.

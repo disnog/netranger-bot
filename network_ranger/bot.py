@@ -36,6 +36,7 @@ class NetworkRanger(commands.Bot):
     def __init__(self, config: Config):
         self.config = config
         self._db: Optional[Database] = None
+        self._initial_sync_done = False
         
         intents = discord.Intents.default()
         intents.members = True
@@ -86,9 +87,17 @@ class NetworkRanger(commands.Bot):
         guild = self.get_guild(self.config.guild_id)
         if guild:
             logger.info(f"Connected to guild: {guild.name}")
-            
-            # Sync existing members to database
-            await self.sync_members(guild)
+
+            # discord.py fires on_ready again after a reconnect that needs a
+            # new gateway session, not only at startup. Run the full member
+            # sync once per process; /syncdb is there for a manual re-run.
+            if not self._initial_sync_done:
+                self._initial_sync_done = True
+                try:
+                    await self.sync_members(guild)
+                except Exception:
+                    self._initial_sync_done = False
+                    logger.exception("Initial member sync failed; will retry on next on_ready")
     
     async def sync_members(self, guild: discord.Guild) -> None:
         """Sync all guild members to the database."""
@@ -126,6 +135,15 @@ class NetworkRanger(commands.Bot):
             count += 1
         
         logger.info(f"Synced {count} members to database")
+
+        # Number current Members who don't have a member number yet, in join
+        # order, as the legacy bot's startup sync did. These are members who
+        # already belong to the server, so nothing is announced.
+        assigned = await self.db.users.assign_missing_member_numbers(with_role="Member")
+        for user_id, member_number in assigned:
+            logger.info(f"Assigned member number #{member_number} to user {user_id}")
+        if assigned:
+            logger.info(f"Assigned {len(assigned)} missing member numbers")
     
     async def close(self) -> None:
         """Clean up when bot is shutting down."""

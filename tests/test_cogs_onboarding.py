@@ -150,3 +150,95 @@ async def test_returning_periphery_member_does_not_get_join_prompt(onboarding_co
     member_channel.send.assert_awaited_once()
     welcome_channel.send.assert_not_awaited()
     assert "welcome back" in member_channel.send.await_args.args[0].lower()
+
+
+def _known_roles(*pairs):
+    return SimpleNamespace(
+        known_roles=[
+            SimpleNamespace(role_id=role_id, significances=[sig]) for role_id, sig in pairs
+        ]
+    )
+
+
+@pytest.mark.asyncio
+async def test_member_added_by_web_join_is_not_welcomed_back(onboarding_cog, mock_bot):
+    """Web assigns the number and adds the role before Discord fires on_member_join."""
+    member = _build_member()
+    member_role = MagicMock()
+    member.roles = [member_role]  # web's guild-join call attached the role
+    member_channel = MagicMock()
+    member_channel.send = AsyncMock()
+    welcome_channel = MagicMock()
+    welcome_channel.send = AsyncMock()
+
+    mock_bot.db.users.upsert = AsyncMock()
+    mock_bot.db.users.get_permanent_roles = AsyncMock(return_value=["Member"])
+    mock_bot.db.users.get_member_number = AsyncMock(return_value=501)
+    mock_bot.db.users.assign_member_number = AsyncMock()
+    mock_bot.db.guilds.get = AsyncMock(return_value=_known_roles(("555", "Member")))
+    member.guild.get_role.return_value = member_role
+    mock_bot.get_member_role.return_value = member_role
+    mock_bot.get_member_channel.return_value = member_channel
+    mock_bot.get_welcome_channel.return_value = welcome_channel
+
+    await onboarding_cog.on_member_join(member)
+
+    member.add_roles.assert_not_awaited()
+    mock_bot.db.users.assign_member_number.assert_not_awaited()
+    member_channel.send.assert_not_awaited()
+    welcome_channel.send.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_web_join_with_partial_roles_restores_rest_silently(onboarding_cog, mock_bot):
+    """A member who arrived with some mapped roles came through web, even if
+    the bot still has an extra mapped role (or the name fallback) to add."""
+    member = _build_member()
+    member_role = MagicMock()
+    eggs_role = MagicMock()
+    member.roles = [member_role]
+    member_channel = MagicMock()
+    member_channel.send = AsyncMock()
+
+    mock_bot.db.users.upsert = AsyncMock()
+    mock_bot.db.users.get_permanent_roles = AsyncMock(return_value=["Member", "eggs"])
+    mock_bot.db.users.get_member_number = AsyncMock(return_value=502)
+    mock_bot.db.users.assign_member_number = AsyncMock()
+    mock_bot.db.guilds.get = AsyncMock(
+        return_value=_known_roles(("555", "Member"), ("666", "eggs"))
+    )
+    member.guild.get_role.side_effect = lambda rid: {555: member_role, 666: eggs_role}[rid]
+    mock_bot.get_member_role.return_value = member_role
+    mock_bot.get_member_channel.return_value = member_channel
+    mock_bot.get_welcome_channel.return_value = MagicMock()
+
+    await onboarding_cog.on_member_join(member)
+
+    member.add_roles.assert_awaited_once_with(eggs_role, reason="Restoring permanent roles")
+    member_channel.send.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_periphery_added_by_web_join_is_not_welcomed_back(onboarding_cog, mock_bot):
+    member = _build_member()
+    periphery_role = MagicMock()
+    member.roles = [periphery_role]
+    member_channel = MagicMock()
+    member_channel.send = AsyncMock()
+    welcome_channel = MagicMock()
+    welcome_channel.send = AsyncMock()
+
+    mock_bot.db.users.upsert = AsyncMock()
+    mock_bot.db.users.get_permanent_roles = AsyncMock(return_value=["periphery"])
+    mock_bot.db.users.assign_member_number = AsyncMock()
+    mock_bot.db.guilds.get = AsyncMock(return_value=_known_roles(("777", "periphery")))
+    member.guild.get_role.return_value = periphery_role
+    mock_bot.get_member_role.return_value = MagicMock()
+    mock_bot.get_member_channel.return_value = member_channel
+    mock_bot.get_welcome_channel.return_value = welcome_channel
+
+    await onboarding_cog.on_member_join(member)
+
+    member.add_roles.assert_not_awaited()
+    member_channel.send.assert_not_awaited()
+    welcome_channel.send.assert_not_awaited()

@@ -100,7 +100,16 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
         if "Member" in permanent_roles and member_role and member_role not in roles_to_add:
             roles_to_add.append(member_role)
 
+        # Web /join adds members to the guild with their permanent roles
+        # already attached, and posts the welcome itself. A member who
+        # arrives with none of those roles came in through an invite link, so
+        # if we have roles to restore, they're a returning member. One who
+        # arrives with any of them came through web and is not greeted again
+        # here. This is the signal the legacy bot used.
+        arrived_with_roles = any(role in member.roles for role in roles_to_add)
         roles_to_restore = [role for role in roles_to_add if role not in member.roles]
+        returning = bool(roles_to_restore) and not arrived_with_roles
+
         if roles_to_restore:
             await member.add_roles(*roles_to_restore, reason="Restoring permanent roles")
 
@@ -108,13 +117,15 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
         if "Member" in accepted_roles:
             existing_number = await self.bot.db.users.get_member_number(member.id)
             if existing_number:
-                if member_channel:
+                if returning and member_channel:
                     await member_channel.send(
                         f"{member.mention}, welcome back to {guild.name}! "
                         f"We've held on to your previous member number, #{existing_number}."
                     )
                 return
 
+            # Web assigns the number before adding a Member to the guild, so
+            # reaching here means nobody has announced this number yet.
             member_number = await self.bot.db.users.assign_member_number(member.id)
             target_channel = member_channel or welcome_channel
             if target_channel:
@@ -124,6 +135,8 @@ class OnboardingCog(commands.Cog, name="Onboarding"):
             return
 
         if accepted_roles:
+            if not returning:
+                return
             target_channel = member_channel or welcome_channel
             if target_channel:
                 await target_channel.send(
