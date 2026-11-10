@@ -23,7 +23,6 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
-
 from netranger_db import Database
 
 from .config import Config
