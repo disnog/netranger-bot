@@ -152,6 +152,23 @@ branch behavior where current Discord role state is authoritative for members
 who are still in the guild. Returning members who are not currently in the guild
 keep their stored permanent roles for restoration on rejoin.
 
+The same sync then numbers every current Member who has no member number yet,
+in `first_joined_at` order, as the legacy bot did. Nothing is announced for
+these backfilled numbers; they're logged.
+
+The full sync runs once per process start. discord.py can fire `on_ready`
+again after a gateway reconnect, and that no longer re-runs the sync. Use
+`/syncdb` to run it by hand.
+
+### Welcome messages
+
+Web `/join` posts the "Welcome @user, member #N" announcement to the
+DB-mapped `greeting` channel (`periphery_greeting` for periphery users), as
+legacy web did. The bot stays quiet for members who arrive with their
+permanent roles already attached, because that means web added them. It
+posts "welcome back" only for members who rejoin through an invite link and
+need their roles restored.
+
 **Note**: Slash command sync may take a few minutes to propagate.
 
 ## Cog Structure
@@ -182,9 +199,11 @@ network_ranger/
   - [ ] `/myinfo` shows profile
   - [ ] `/ipcalc 192.168.1.0/24` shows subnet info
   - [ ] New members without accepted roles are prompted to use `/join`
+  - [ ] A brand-new Member who joins through web gets one welcome in the greeting channel and no "welcome back" from the bot
   - [ ] Returning members get permanent roles restored and member number retained
   - [ ] Returning `periphery` and `recruiter` users are welcomed back without being sent to `/join`
   - [ ] `/syncdb` removes stale stored roles from current members after a Discord role is removed
+  - [ ] Bot log shows any member numbers assigned to current Members who had none
 
 ## Troubleshooting
 

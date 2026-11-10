@@ -20,15 +20,15 @@ from __future__ import annotations
 
 import json
 import logging
+from email.message import EmailMessage
 from typing import TYPE_CHECKING, Optional
 
+import aiosmtplib
 import discord
+from cryptography.fernet import Fernet, InvalidToken
 from discord import app_commands
 from discord.ext import commands
-from cryptography.fernet import Fernet, InvalidToken
-from email_validator import validate_email, EmailNotValidError
-import aiosmtplib
-from email.message import EmailMessage
+from email_validator import EmailNotValidError, validate_email
 
 if TYPE_CHECKING:
     from ..bot import NetworkRanger
